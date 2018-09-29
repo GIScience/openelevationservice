@@ -1,1 +1,3 @@
 .venv/
+.spyproject/
+*__pycache__/
