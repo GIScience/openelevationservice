@@ -38,7 +38,7 @@ def download():
     counter = 0
     for link in soup.find_all('a', attrs={'href': lambda x: x.startswith('srtm')}):
         counter += 1
-        if counter == 450:
+        if counter == 50:
             break
         else:
             # Then load the zip data in memory
