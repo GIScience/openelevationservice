@@ -2,3 +2,5 @@
 .spyproject/
 *__pycache__/
 tiles/
+*.log
+openelevationservice/server/ops_settings.yml
