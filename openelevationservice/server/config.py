@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
+import os.path
+import yaml
 
-from openelevationservice.server import SETTINGS
+"""load custom settings for openelevationservice"""
+basedir = os.path.abspath(os.path.dirname(__file__))
+SETTINGS = yaml.safe_load(open(os.path.join(basedir, 'ops_settings.yml')))
+
+if "TESTING" in os.environ:
+    SETTINGS['provider_parameters']['table_name'] = SETTINGS['provider_parameters']['table_name'] + '_test'
 
 
 class BaseConfig(object):
@@ -19,9 +26,6 @@ class ProductionConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = 'postgresql://{user_name}:{password}@{host}:{port}/{db_name}'.format(**SETTINGS['provider_parameters'])
     DEBUG_TB_ENABLED = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_BINDS = {
-    'pg':        'postgresql://{user_name}:{password}@{host}:{port}/{db_name}'.format(**SETTINGS['provider_parameters']), 
-    }
 
 
 class DevelopmentConfig(BaseConfig):

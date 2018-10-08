@@ -1,32 +1,23 @@
 # -*- coding: utf-8 -*-
-
+from openelevationservice.server.db_import.models import db
+from openelevationservice.server.config import SETTINGS
 from openelevationservice.server.api import api_exceptions
 from openelevationservice.server.utils import logger
-from openelevationservice.server.api.views import main_blueprint
 
 from flask import Flask, jsonify, g
-from flask_sqlalchemy import SQLAlchemy
+#from flask_sqlalchemy import SQLAlchemy
 from flasgger import Swagger
 #from flask_cors import CORS
-import yaml
 import os
 import time
 
 log = logger.get_logger(__name__)
-
-"""load custom settings for openelevationservice"""
 basedir = os.path.abspath(os.path.dirname(__file__))
-SETTINGS = yaml.safe_load(open(os.path.join(basedir, 'ops_settings.yml')))
-
-if "TESTING" in os.environ:
-    SETTINGS['provider_parameters']['table_name'] = SETTINGS['provider_parameters']['table_name'] + '_test'
-
-db = SQLAlchemy()
 
 def create_app(script_info=None):
     # instantiate the app
     
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__)
 
     app.config['SWAGGER'] = {
         'title': 'openelevationservice',
@@ -42,8 +33,16 @@ def create_app(script_info=None):
 
     # set up extensions
     db.init_app(app)
+    
+    provider_details = SETTINGS['provider_parameters']
+    log.debug("Following provider parameters are active:\n"
+              "Host:\t{host}\n"
+              "DB:\t{db_name}\n"
+              "Table:\t{table_name}\n"
+              "User:\t{user_name}".format(**provider_details))
 
     # register blueprints
+    from openelevationservice.server.api.views import main_blueprint
     app.register_blueprint(main_blueprint)
 
     Swagger(app, template_file='api/oes_post.yaml')

@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
+from openelevationservice.server import create_app
 from openelevationservice.server.utils.logger import get_logger
-from openelevationservice.server import SETTINGS, create_app, db
+from openelevationservice.server.config import SETTINGS
+from openelevationservice.server.db_import.models import db
 
 import os
 import requests
+import subprocess
 import zipfile
 from bs4 import BeautifulSoup
 
@@ -14,6 +17,7 @@ except:
     from StringIO import StringIO
 
 log = get_logger(__name__)
+tiles_dir = os.path.join(os.getcwd(), 'tiles')
 
 app = create_app()
 
@@ -21,7 +25,6 @@ app = create_app()
 def download():
     """Downloads SRTM tiles to disk"""
     base_url = r'http://data.cgiar-csi.org/srtm/tiles/GeoTIFF/'
-    outdir = os.path.join(os.getcwd(), 'tiles')
     
     # Create session for authentication
     session = requests.Session()
@@ -40,7 +43,7 @@ def download():
                 if filename != 'readme.txt':
                     data = zip_obj.read(filename)
                     # Write byte contents to file
-                    with open(os.path.join(outdir, filename), 'wb') as f:
+                    with open(os.path.join(tiles_dir, filename), 'wb') as f:
                         f.write(data)
         
         log.debug("Downloaded file {}".format(link.text))
@@ -48,13 +51,39 @@ def download():
 
 @app.cli.command()
 def create():
-    with app.test_request_context():
-        db.create_all(app=create_app())
+    db.create_all()
+    log.debug("Table {} was created.".format(SETTINGS['provider_parameters']['table_name']))
     
     
 @app.cli.command()
 def drop():
     db.drop_all()
+    log.debug("Table {} was dropped.".format(SETTINGS['provider_parameters']['table_name']))
+    
+
+@app.cli.command()
+def importdata(): 
+    
+    log.info("Starting to import data...")
+
+    #TODO: Add logic for docker setup  
+#    docker_id = subprocess.run(["sudo docker ps -a",
+#                    " | grep postgis"
+#                    " | awk '{print $1}'"],
+#                    stdout=subprocess.PIPE)
+    
+    cmd_docker = 'sudo docker exec 3fe21d5b4a78 '
+        
+    cmd_raster = 'raster2pgsql -a -I -C -F -P -M {}/*.tif {} | sudo -u {} psql -d {}'.format(tiles_dir,
+                                          pg_settings['table_name'],
+                                          pg_settings['user_name'],
+                                          pg_settings['db_name']
+                                          )
+    subprocess.run([cmd_docker, cmd_raster], 
+                   stdout=subprocess.DEVNULL, 
+                   stderr=subprocess.STDOUT)
+    
+    log.info("Imported data successfully!")
     
 if __name__=='__main__':
     create()
