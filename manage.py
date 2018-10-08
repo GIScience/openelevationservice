@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from flask.cli import FlaskGroup
-
 from openelevationservice.server.utils.logger import get_logger
-from openelevationservice.server import SETTINGS
+from openelevationservice.server import SETTINGS, create_app, db
 
 import os
 import requests
@@ -17,14 +15,13 @@ except:
 
 log = get_logger(__name__)
 
-#app = create_app()
-#cli = FlaskGroup(create_app=create_app)
+app = create_app()
 
-#@cli.command()
+@app.cli.command()
 def download():
     """Downloads SRTM tiles to disk"""
     base_url = r'http://data.cgiar-csi.org/srtm/tiles/GeoTIFF/'
-    outdir = os.path.join(os.getcwd(), 'tiles') 
+    outdir = os.path.join(os.getcwd(), 'tiles')
     
     # Create session for authentication
     session = requests.Session()
@@ -48,5 +45,16 @@ def download():
         
         log.debug("Downloaded file {}".format(link.text))
         
+
+@app.cli.command()
+def create():
+    with app.test_request_context():
+        db.create_all(app=create_app())
+    
+    
+@app.cli.command()
+def drop():
+    db.drop_all()
+    
 if __name__=='__main__':
-    download()
+    create()
