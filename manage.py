@@ -63,7 +63,7 @@ def drop():
 
 @app.cli.command()
 def importdata(): 
-    
+    pg_settings = SETTINGS['provider_parameters']
     log.info("Starting to import data...")
 
     #TODO: Add logic for docker setup  
@@ -72,16 +72,21 @@ def importdata():
 #                    " | awk '{print $1}'"],
 #                    stdout=subprocess.PIPE)
     
-    cmd_docker = 'sudo docker exec 3fe21d5b4a78 '
+#    cmd_docker = 'sudo docker exec 3b3df0a1eb41 '
         
-    cmd_raster = 'raster2pgsql -a -I -C -F -P -M {}/*.tif {} | sudo -u {} psql -d {}'.format(tiles_dir,
-                                          pg_settings['table_name'],
+    cmd_raster = 'psql -h {} -p {} -U {} -d {} '.format(pg_settings['host'],
+                                          pg_settings['port'],
                                           pg_settings['user_name'],
                                           pg_settings['db_name']
                                           )
-    subprocess.run([cmd_docker, cmd_raster], 
+    env_current = os.environ.copy()
+    # TODO: Resort to passwd file:
+    # https://www.postgresql.org/docs/9.6/static/libpq-pgpass.html
+    env_current['PGPASSWORD'] = 'docker'
+    subprocess.run([cmd_raster], 
                    stdout=subprocess.DEVNULL, 
-                   stderr=subprocess.STDOUT)
+                   stderr=subprocess.STDOUT,
+                   env=env_current)
     
     log.info("Imported data successfully!")
     
