@@ -1,0 +1,21 @@
+Timing is on.
+                                                              QUERY PLAN                                                              
+--------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=2803.31..2803.32 rows=1 width=32) (actual rows=1 loops=1)
+   CTE line
+     ->  Result  (cost=0.00..0.01 rows=1 width=32) (actual rows=1 loops=1)
+   CTE cells
+     ->  Nested Loop  (cost=0.14..2788.01 rows=291 width=40) (actual rows=394 loops=1)
+           ->  CTE Scan on line  (cost=0.00..5.27 rows=1000 width=32) (actual rows=394 loops=1)
+           ->  Index Scan using oes_cgiar_st_convexhull_idx on oes_cgiar  (cost=0.14..2.69 rows=1 width=18) (actual rows=1 loops=394)
+                 Index Cond: ((rast)::geometry && ((st_dumppoints(line.geom)).geom))
+                 Filter: _st_intersects(((st_dumppoints(line.geom)).geom), rast, NULL::integer)
+   CTE points3d
+     ->  CTE Scan on cells  (cost=0.00..8.73 rows=291 width=32) (actual rows=394 loops=1)
+   ->  CTE Scan on points3d  (cost=0.00..5.82 rows=291 width=32) (actual rows=394 loops=1)
+ Planning time: 3.136 ms
+ Execution time: 17587.361 ms
+(14 rows)
+
+Time: 17639.668 ms (00:17.640)
+Time: 0.201 ms
