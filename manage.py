@@ -65,28 +65,25 @@ def drop():
 def importdata(): 
     pg_settings = SETTINGS['provider_parameters']
     log.info("Starting to import data...")
-
-    #TODO: Add logic for docker setup  
-#    docker_id = subprocess.run(["sudo docker ps -a",
-#                    " | grep postgis"
-#                    " | awk '{print $1}'"],
-#                    stdout=subprocess.PIPE)
     
-#    cmd_docker = 'sudo docker exec 3b3df0a1eb41 '
-        
-    cmd_raster = 'psql -h {} -p {} -U {} -d {} '.format(pg_settings['host'],
-                                          pg_settings['port'],
-                                          pg_settings['user_name'],
-                                          pg_settings['db_name']
-                                          )
+    cmd_raster2pgsql = 'raster2pgsql -a -I -C -F -P -M tiles/*.tif {}'.format(pg_settings['table_name'])
+    cmd_psql = ' | psql -h {host} -p {port} -U {user_name} -d {db_name}'.format(**pg_settings['host'],)
+    
+    # Copy all env variables and add PGPASSWORD
     env_current = os.environ.copy()
     # TODO: Resort to passwd file:
     # https://www.postgresql.org/docs/9.6/static/libpq-pgpass.html
-    env_current['PGPASSWORD'] = 'docker'
-    subprocess.run([cmd_raster], 
-                   stdout=subprocess.DEVNULL, 
-                   stderr=subprocess.STDOUT,
-                   env=env_current)
+    env_current['PGPASSWORD'] = pg_settings['password']
+    
+    try:
+        subprocess_out = subprocess.check_output([cmd_raster2pgsql, cmd_psql], 
+                                               stdout=subprocess.DEVNULL, 
+                                               stderr=subprocess.STDOUT,
+                                               env=env_current)
+    except subprocess.CalledProcessError as e:
+        log.error("Shell exited with code: {}\nMessage: {}".format(e.returncode,
+                                                                  e.output))
+        raise
     
     log.info("Imported data successfully!")
     
