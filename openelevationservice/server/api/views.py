@@ -1,45 +1,57 @@
 # -*- coding: utf-8 -*-
 
+from openelevationservice import SETTINGS
 from openelevationservice.server.api import api_exceptions
+from openelevationservice.server.utils.logger import get_logger
+from openelevationservice.server.api.querybuilder import request_elevation
 
-from flask import Blueprint, request, jsonify, Response
-from voluptuous import Schema, Required, Length, Range, Coerce, Any, All, MultipleInvalid, ALLOW_EXTRA, Invalid, \
-    Optional, Boolean
-import copy
+from flask import Blueprint, request, Response
+import geojson
+from shapely.geometry import shape
     
+log = get_logger(__name__)
+
 main_blueprint = Blueprint('main', __name__, )
 
-schema = Schema({
-    Required('request'): Required('geometry',
-                                  msg='pois, stats or list missing'),
-})    
-
-@main_blueprint.route('/elevation', methods=['POST'])
+@main_blueprint.route('/elevation/line', methods=['POST'])
 def elevation():
     """
-    Function called when user posts to /elevation.
+    Function called when user posts to /elevation/line.
 
     :returns: elevation response 
-    :type: string
+    :type: Response
     """
 
     if request.method == 'POST':
-
-        if 'application/json' in request.headers['Content-Type'] and request.is_json:
-
-            all_args = request.get_json(silent=True)
-
-            raw_request = copy.deepcopy(all_args)
-
-            if all_args is None:
-                raise api_exceptions.InvalidUsage(status_code=500, error_code=4000)
-
+        if 'application/json' in request.headers['Content-Type']:
+            if request is None:
+                raise api_exceptions.InvalidUsage(status_code=500,
+                                                  error_code=4000,
+                                                  message='Empty reques')
+            # Make sure geojson is valid
+            # invokes shapely's __geo_interface__ method
             try:
-                schema(all_args)
-            except MultipleInvalid as error:
-                raise api_exceptions.InvalidUsage(status_code=500, error_code=4000, message=str(error))
-            # query stats
-
+                geom = shape(geojson.loads(request.data))
+            except Exception as e:
+                raise api_exceptions.InvalidUsage(status_code=500,
+                                                  error_code=4001,
+                                                  message=str(e))
+                
+            if len(list(geom.coords)) > SETTINGS['maximum_nodes']:
+                raise api_exceptions.InvalidUsage(status_code=500,
+                                                  error_code=4002,
+                                                  message='Maximum number of nodes exceeded.')
+            
+            if geom.geom_type not in ('LineString', 'Point'):
+                raise api_exceptions.InvalidUsage(status_code=500,
+                                                  error_code=4001,
+                                                  message='GeoJSON type {} not supported'.format(geom.geom_type))
+            
+            results = request_elevation(geom)
+            
     else:
-
-        raise api_exceptions.InvalidUsage(status_code=500, error_code=4006)
+        raise api_exceptions.InvalidUsage(status_code=500,
+                                          error_code=4000,
+                                          message='Unsupported method') 
+    
+    return Response(results, mimetype='application/json; charset=utf-8')

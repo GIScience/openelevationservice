@@ -25,4 +25,11 @@ Create database for user:
 
 Example raster2pgsql command:
 
-`raster2pgsql -a -I -C -F -P -M srtm_01_07.tif public.oes_cgiar | sudo -u gis psql -d gis_test`
+`raster2pgsql -a -I -C -F -P -M *.tif public.oes_cgiar | psql -U docker -h localhost -p 5432 -d gis`
+
+
+## ENV variables
+
+OES_LOGPATH
+OES_LOGLEVEL
+TESTING

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
+from openelevationservice import SETTINGS
 from openelevationservice.server.db_import.models import db
-from openelevationservice.server.config import SETTINGS
 from openelevationservice.server.api import api_exceptions
 from openelevationservice.server.utils import logger
 
@@ -12,7 +12,6 @@ import os
 import time
 
 log = logger.get_logger(__name__)
-basedir = os.path.abspath(os.path.dirname(__file__))
 
 def create_app(script_info=None):
     # instantiate the app
@@ -28,7 +27,7 @@ def create_app(script_info=None):
 
 
     # set config
-    app_settings = os.getenv('APP_SETTINGS',   'openelevationservice.server.config.ProductionConfig')
+    app_settings = os.getenv('APP_SETTINGS',   'openelevationservice.server.config.DevelopmentConfig')
     app.config.from_object(app_settings)
 
     # set up extensions
@@ -47,7 +46,7 @@ def create_app(script_info=None):
 
     Swagger(app, template_file='api/oes_post.yaml')
 
-    if "DEVELOPMENT" in os.environ:
+    if "Development" in app_settings:
         @app.before_request
         def before_request():
             g.start = time.time()
@@ -56,7 +55,7 @@ def create_app(script_info=None):
         def teardown_request(exception=None):
             # if 'start' in g:
             diff = time.time() - g.start
-            logger.info("Request took: {} seconds".format(diff))
+            log.debug("Request took: {} seconds".format(diff))
 
     # error handlers
     @app.errorhandler(401)

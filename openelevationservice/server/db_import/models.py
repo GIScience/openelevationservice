@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
 
+from openelevationservice import SETTINGS
 from openelevationservice.server.utils import logger
+
 from flask_sqlalchemy import SQLAlchemy
-from openelevationservice.server.config import SETTINGS
+from sqlalchemy import Index
+from geoalchemy2 import Raster
 
 db = SQLAlchemy()
 
-from geoalchemy2 import Raster
-
 log = logger.get_logger(__name__)
+table_name = SETTINGS['provider_parameters']['table_name']
 
 class Cgiar(db.Model):
-    __tablename__ = SETTINGS['provider_parameters']['table_name']
+    __tablename__ = table_name
     
     rid = db.Column(db.Integer, primary_key=True)
     rast = db.Column(Raster)
-    filename = db.Column(db.Text)
+    
+    def __repr__(self):
+        return '<rid {}, rast {}>'.format(self.rid, self.rast)

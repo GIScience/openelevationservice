@@ -4,88 +4,60 @@ from openelevationservice.server import create_app
 from openelevationservice.server.utils.logger import get_logger
 from openelevationservice.server.config import SETTINGS
 from openelevationservice.server.db_import.models import db
+from openelevationservice.server.db_import import filestreams
 
-import os
-import requests
-import subprocess
-import zipfile
-from bs4 import BeautifulSoup
-
-try:
-    from io import BytesIO
-except:
-    from StringIO import StringIO
+import click
 
 log = get_logger(__name__)
-tiles_dir = os.path.join(os.getcwd(), 'tiles')
 
 app = create_app()
 
+#TODO: import click and add xy_range as parameter
 @app.cli.command()
-def download():
-    """Downloads SRTM tiles to disk"""
-    base_url = r'http://data.cgiar-csi.org/srtm/tiles/GeoTIFF/'
+@click.option('--xyrange', default='0,73,0,25')
+def download(xy_range_txt):
+    """
+    Downloads SRTM tiles to disk. Can be specified over minx, maxx, miny, maxy.
     
-    # Create session for authentication
-    session = requests.Session()
-    session.auth = tuple(SETTINGS['srtm_parameters'].values())
-    response = session.get(base_url)
+    :param xy_range_txt: A comma-separated list of x_min, x_max, y_min, y_max
+        in that order. For reference grid, see http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp
+    :type xy_range_txt: comma-separated integers
+    """
     
-    soup = BeautifulSoup(response.content)
-    
-    # First find all 'a' tags starting href with srtm*
-    for link in soup.find_all('a', attrs={'href': lambda x: x.startswith('srtm')}):
-        # Then load the zip data in memory
-        with zipfile.ZipFile(BytesIO(session.get(base_url + link.text).content)) as zip_obj:
-            # Loop through the files in the zip
-            for filename in zip_obj.namelist():
-                # Don't extract the readme.txt
-                if filename != 'readme.txt':
-                    data = zip_obj.read(filename)
-                    # Write byte contents to file
-                    with open(os.path.join(tiles_dir, filename), 'wb') as f:
-                        f.write(data)
-        
-        log.debug("Downloaded file {}".format(link.text))
-        
+    filestreams.downloaddata(arg_format(xy_range_txt))
 
 @app.cli.command()
 def create():
+    """Creates all tables defined in models.py"""
+    
     db.create_all()
-    log.debug("Table {} was created.".format(SETTINGS['provider_parameters']['table_name']))
+    log.info("Table {} was created.".format(SETTINGS['provider_parameters']['table_name']))
     
     
 @app.cli.command()
 def drop():
+    """Drops all tables defined in models.py"""
+    
     db.drop_all()
-    log.debug("Table {} was dropped.".format(SETTINGS['provider_parameters']['table_name']))
+    log.info("Table {} was dropped.".format(SETTINGS['provider_parameters']['table_name']))
     
 
 @app.cli.command()
-def importdata(): 
-    pg_settings = SETTINGS['provider_parameters']
+@click.option('--xyrange', default='0,73,0,25')
+def importdata(xy_range): 
+    """Imports all data found in ./tiles"""
     log.info("Starting to import data...")
     
-    cmd_raster2pgsql = 'raster2pgsql -a -I -C -F -P -M tiles/*.tif {}'.format(pg_settings['table_name'])
-    cmd_psql = ' | psql -h {host} -p {port} -U {user_name} -d {db_name}'.format(**pg_settings['host'],)
-    
-    # Copy all env variables and add PGPASSWORD
-    env_current = os.environ.copy()
-    # TODO: Resort to passwd file:
-    # https://www.postgresql.org/docs/9.6/static/libpq-pgpass.html
-    env_current['PGPASSWORD'] = pg_settings['password']
-    
-    try:
-        subprocess_out = subprocess.check_output([cmd_raster2pgsql, cmd_psql], 
-                                               stdout=subprocess.DEVNULL, 
-                                               stderr=subprocess.STDOUT,
-                                               env=env_current)
-    except subprocess.CalledProcessError as e:
-        log.error("Shell exited with code: {}\nMessage: {}".format(e.returncode,
-                                                                  e.output))
-        raise
+    filestreams.raster2pgsql(arg_format(xy_range_txt))
     
     log.info("Imported data successfully!")
     
-if __name__=='__main__':
-    create()
+
+def arg_format(xy_range_txt):
+    
+    str_split = [int(s.strip()) for s in xy_range_txt.split(',')]
+    
+    xy_range = [[str_split[0], str_split[1]],
+                [str_split[2], str_split[3]]]
+    
+    return xy_range
