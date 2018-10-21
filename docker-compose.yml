@@ -6,5 +6,5 @@ services:
   volumes:
   - ./tiles:/deploy/app/tiles
   ports:
-   - "5000:5000"
+   - "5020:5000"
   mem_limit: 28g
