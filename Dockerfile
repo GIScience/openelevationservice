@@ -34,7 +34,7 @@ RUN python3 -m venv /oes_venv
 
 RUN /bin/bash -c "source /oes_venv/bin/activate"
 
-RUN pip install -r /deploy/app/requirements.txt
+RUN /oes_venv/bin/pip3 install -r /deploy/app/requirements.txt
 
 COPY openelevationservice /deploy/app/openelevationservice
 COPY ops_settings_docker.yml /deploy/app/openelevationservice/server/ops_settings.yml
