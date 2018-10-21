@@ -16,3 +16,4 @@ flasgger==0.9.1
 jsonschema==2.6.0
 mistune==0.8.4
 psycopg2==2.7.5
+gunicorn==19.9.0
