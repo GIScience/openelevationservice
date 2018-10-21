@@ -6,8 +6,6 @@ MAINTAINER Nils Nolde <nils@openrouteservice.org>
 
 RUN apt-get update
 RUN apt-get install -y locales git
-# Needs postgis installation locally for raster2pgsql
-RUN apt-get install -y postgis
 
 # Set the locale
 RUN locale-gen en_US.UTF-8
@@ -20,6 +18,9 @@ ENV OES_LOGLEVEL INFO
 RUN /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata"
 RUN ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime
 RUN dpkg-reconfigure --frontend noninteractive tzdata
+
+# Needs postgis installation locally for raster2pgsql
+RUN apt-get install -y postgis
 
 # Setup flask application
 RUN mkdir -p /deploy/app
