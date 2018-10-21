@@ -6,8 +6,8 @@ srtm_parameters:
   user: user
   password: pw
 provider_parameters:
-  table_name: "50_tiles"
-  db_name: gis_test
+  table_name: oes_cgiar
+  db_name: oes_prod
   user_name: gis
   password: gis
   host: localhost
