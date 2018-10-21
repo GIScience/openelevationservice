@@ -12,19 +12,18 @@ log = get_logger(__name__)
 
 app = create_app()
 
-#TODO: import click and add xy_range as parameter
 @app.cli.command()
 @click.option('--xyrange', default='0,73,0,25')
-def download(xy_range_txt):
+def download(xyrange):
     """
     Downloads SRTM tiles to disk. Can be specified over minx, maxx, miny, maxy.
     
-    :param xy_range_txt: A comma-separated list of x_min, x_max, y_min, y_max
+    :param xyrange: A comma-separated list of x_min, x_max, y_min, y_max
         in that order. For reference grid, see http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp
-    :type xy_range_txt: comma-separated integers
+    :type xyrange: comma-separated integers
     """
     
-    filestreams.downloaddata(arg_format(xy_range_txt))
+    filestreams.downloadsrtm(_arg_format(xyrange))
 
 @app.cli.command()
 def create():
@@ -44,16 +43,22 @@ def drop():
 
 @app.cli.command()
 @click.option('--xyrange', default='0,73,0,25')
-def importdata(xy_range): 
-    """Imports all data found in ./tiles"""
+def importdata(xyrange): 
+    """
+    Imports all data found in ./tiles
+    
+    :param xyrange: A comma-separated list of x_min, x_max, y_min, y_max
+        in that order. For reference grid, see http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp
+    :type xyrange: comma-separated integers
+    """
     log.info("Starting to import data...")
     
-    filestreams.raster2pgsql(arg_format(xy_range_txt))
+    filestreams.raster2pgsql(_arg_format(xyrange))
     
     log.info("Imported data successfully!")
     
 
-def arg_format(xy_range_txt):
+def _arg_format(xy_range_txt):
     
     str_split = [int(s.strip()) for s in xy_range_txt.split(',')]
     

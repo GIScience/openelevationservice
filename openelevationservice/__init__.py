@@ -9,3 +9,5 @@ if "TESTING" in environ:
     SETTINGS['provider_parameters']['table_name'] = SETTINGS['provider_parameters']['table_name'] + '_test'
 
 TILES_DIR = path.join(getcwd(), 'tiles')
+
+__version__ = "0.1"

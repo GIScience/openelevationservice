@@ -1,0 +1,14 @@
+---
+attribution: "service by https://openrouteservice.org | data by http://srtm.csi.cgiar.org"
+coord_precision: 1e-6
+maximum_nodes: 2000
+srtm_parameters:
+  user: user
+  password: pw
+provider_parameters:
+  table_name: oes_cgiar
+  db_name: gis
+  user_name: gis
+  password: gis
+  host: localhost
+  port: 5432

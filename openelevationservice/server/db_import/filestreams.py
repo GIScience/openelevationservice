@@ -16,7 +16,15 @@ except:
     
 log = get_logger(__name__)
 
-def downloaddata(xy_range):
+def downloadsrtm(xy_range):
+    """
+    Downlaods SRTM v4.1 tiles as bytestream and saves them to TILES_DIR.
+    
+    :param xy_range: The range of tiles in x and y as per grid in 
+        http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp
+        in 'minx, maxx, miny, maxy.
+    :type xy_range: comma-separated range string
+    """
     
     base_url = r'http://data.cgiar-csi.org/srtm/tiles/GeoTIFF/'
     
@@ -25,28 +33,40 @@ def downloaddata(xy_range):
     session.auth = tuple(SETTINGS['srtm_parameters'].values())
     response = session.get(base_url)
     
-    soup = BeautifulSoup(response.content)
+    soup = BeautifulSoup(response.content, features="html.parser")
     
     # First find all 'a' tags starting href with srtm*
-    for link in soup.find_all('a', attrs={'href': lambda x: x.startswith('srtm')}):
-        link_text = link.text.split('_')
+    for link in soup.find_all('a', attrs={'href': lambda x: x.startswith('srtm') and x.endswith('.zip')}):
+        link_parsed = link.text.split('_')
+        link_x = int(link_parsed[1])
+        link_y = int(link_parsed[2].split('.')[0])
         # Check if referenced geotif link is in xy_range
-        if int(link_text[1]) in range(*xy_range[0]) and int(link_text[2].split('.')[0]) in range(*xy_range[1]):
+        if link_x in range(*xy_range[0]) and link_y in range(*xy_range[1]):
             # Then load the zip data in memory
-            with zipfile.ZipFile(BytesIO(session.get(base_url + link.text).content)) as zip_obj:
-                # Loop through the files in the zip
-                for filename in zip_obj.namelist():
-                    # Don't extract the readme.txt
-                    if filename != 'readme.txt':
-                        data = zip_obj.read(filename)
-                        # Write byte contents to file
-                        with open(path.join(TILES_DIR, filename), 'wb') as f:
-                            f.write(data)
-        
-            log.debug("Downloaded file {}".format(link.text))
+            if path.exists(path.join(TILES_DIR, '_'.join(['srtm', str(link_x), str(link_y), '.tif']))):
+                with zipfile.ZipFile(BytesIO(session.get(base_url + link.text).content)) as zip_obj:
+                    # Loop through the files in the zip
+                    for filename in zip_obj.namelist():
+                        # Don't extract the readme.txt
+                        if filename != 'readme.txt':
+                            data = zip_obj.read(filename)
+                            # Write byte contents to file
+                            with open(path.join(TILES_DIR, filename), 'wb') as f:
+                                f.write(data)        
+                log.debug("Downloaded file {}".format(link.text))
+            else:
+                log.debug("File {} already esists.".format(link.text))
             
 
-def raster2pgsql(xy_range=[[0,73], [0, 25]]):
+def raster2pgsql(xy_range):
+    """
+    Imports SRTM v4.1 tiles to PostGIS.
+    
+    :param xy_range: The range of tiles in x and y as per grid in 
+        http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp
+        in 'minx, maxx, miny, maxy.
+    :type xy_range: comma-separated range string
+    """
     
     pg_settings = SETTINGS['provider_parameters']
     

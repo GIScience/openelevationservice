@@ -7,7 +7,6 @@ class InvalidUsage(Exception):
 
     def __init__(self, status_code=500, error_code=None, message=None):
         """
-
         :param status_code: the HTTP status code
         :type status_code: integer
 
@@ -15,10 +14,9 @@ class InvalidUsage(Exception):
         :type payload: integer
         
         :param message: custom error message
-        :type message: staring
+        :type message: string
         """
 
-        # type: (object, object, object) -> object
         Exception.__init__(self)
 
         if status_code is not None:

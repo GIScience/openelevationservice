@@ -5,9 +5,7 @@ from openelevationservice.server.api import api_exceptions
 from openelevationservice.server.utils import logger
 
 from flask import Flask, jsonify, g
-#from flask_sqlalchemy import SQLAlchemy
 from flasgger import Swagger
-#from flask_cors import CORS
 import os
 import time
 
@@ -25,7 +23,6 @@ def create_app(script_info=None):
         'uiversion': 3
     }
 
-
     # set config
     app_settings = os.getenv('APP_SETTINGS',   'openelevationservice.server.config.DevelopmentConfig')
     app.config.from_object(app_settings)
@@ -34,7 +31,7 @@ def create_app(script_info=None):
     db.init_app(app)
     
     provider_details = SETTINGS['provider_parameters']
-    log.debug("Following provider parameters are active:\n"
+    log.info("Following provider parameters are active:\n"
               "Host:\t{host}\n"
               "DB:\t{db_name}\n"
               "Table:\t{table_name}\n"
@@ -58,21 +55,29 @@ def create_app(script_info=None):
             log.debug("Request took: {} seconds".format(diff))
 
     # error handlers
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({"code": 400, "message": "Bad Request"})
+    
     @app.errorhandler(401)
     def unauthorized_page(error):
-        return jsonify({"error_message": 401})
+        return jsonify({"code": 401, "message": "Unauthorized to view page"})
 
     @app.errorhandler(403)
     def forbidden_page(error):
-        return jsonify({"error_message": 403})
+        return jsonify({"code": 403, "message": "Forbidden page"})
 
     @app.errorhandler(404)
     def page_not_found(error):
-        return jsonify({"error_message": 404})
+        return jsonify({"code": 404, "message": "Endpoint not found"})
+    
+    @app.errorhandler(405)
+    def method_not_allowed(error):
+        return jsonify({"code": 405, 'message': "HTTP Method not allowed"})
 
     @app.errorhandler(500)
     def server_error_page(error):
-        return jsonify({"error_message": 500})
+        return jsonify({"code": 500, 'message': 'Server error'})
 
     @app.errorhandler(api_exceptions.InvalidUsage)
     def handle_invalid_usage(error):
