@@ -27,7 +27,7 @@ def create_app(script_info=None):
     }
 
     # set config
-    app_settings = os.getenv('APP_SETTINGS',   'openelevationservice.server.config.DevelopmentConfig')
+    app_settings = os.getenv('APP_SETTINGS',   'openelevationservice.server.config.ProductionConfig')
     app.config.from_object(app_settings)
 
     # set up extensions
