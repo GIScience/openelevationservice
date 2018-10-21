@@ -1,0 +1,10 @@
+version: '2.2'
+services:
+ gunicorn_flask:
+  #network_mode: "host"
+  build: .
+  volumes:
+  - ./tiles:/deploy/app/tiles
+  ports:
+   - "5000:5000"
+  mem_limit: 28g
