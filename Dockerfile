@@ -5,7 +5,7 @@ FROM ubuntu:18.04
 MAINTAINER Nils Nolde <nils@openrouteservice.org>
 
 RUN apt-get update
-RUN apt-get install -y python-3.7 locales git
+RUN apt-get install -y locales git
 # Needs postgis installation locally for raster2pgsql
 RUN apt-get install -y postgis
 
@@ -24,7 +24,7 @@ COPY manage.py /deploy/app/manage.py
 
 COPY requirements.txt /deploy/app/requirements.txt
 
-RUN python3.7 -m venv /oes_venv
+RUN python3 -m venv /oes_venv
 
 RUN /bin/bash -c "source /oes_venv/bin/activate"
 
