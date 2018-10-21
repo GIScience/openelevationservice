@@ -14,6 +14,8 @@ RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
+# Next line is due to tzdata being interactive
+ENV DEBIAN_FRONTEND=noninteractive
 ENV OES_LOGLEVEL INFO
 
 # Setup flask application
