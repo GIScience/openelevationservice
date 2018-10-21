@@ -5,6 +5,7 @@ from openelevationservice.server.api import api_exceptions
 from openelevationservice.server.utils import logger
 
 from flask import Flask, jsonify, g
+from flask_cors import CORS
 from flasgger import Swagger
 import os
 import time
@@ -15,6 +16,8 @@ def create_app(script_info=None):
     # instantiate the app
     
     app = Flask(__name__)
+    
+    cors = CORS(app, resources={r"/pois/*": {"origins": "*"}})
 
     app.config['SWAGGER'] = {
         'title': 'openelevationservice',
