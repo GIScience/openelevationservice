@@ -43,7 +43,7 @@ def downloadsrtm(xy_range):
         # Check if referenced geotif link is in xy_range
         if link_x in range(*xy_range[0]) and link_y in range(*xy_range[1]):
             # Then load the zip data in memory
-            if path.exists(path.join(TILES_DIR, '_'.join(['srtm', str(link_x), str(link_y), '.tif']))):
+            if not path.exists(path.join(TILES_DIR, '_'.join(['srtm', str(link_x), str(link_y)]) + '.tif')):
                 with zipfile.ZipFile(BytesIO(session.get(base_url + link.text).content)) as zip_obj:
                     # Loop through the files in the zip
                     for filename in zip_obj.namelist():
