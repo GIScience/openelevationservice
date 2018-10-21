@@ -5,7 +5,7 @@ FROM ubuntu:18.04
 MAINTAINER Nils Nolde <nils@openrouteservice.org>
 
 RUN apt-get update
-RUN apt-get install -y locales git
+RUN apt-get install -y locales git python3-venv
 
 # Set the locale
 RUN locale-gen en_US.UTF-8
@@ -44,4 +44,4 @@ WORKDIR /deploy/app
 EXPOSE 5000
 
 # Start gunicorn
-CMD ["/ops_venv/bin/gunicorn", "--config", "/deploy/gunicorn_config.py", "manage:app"]
+CMD ["/oes_venv/bin/gunicorn", "--config", "/deploy/gunicorn_config.py", "manage:app"]
