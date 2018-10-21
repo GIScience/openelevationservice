@@ -15,9 +15,11 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 # Next line is due to tzdata being interactive
-ENV TZ=Europe/Berlin
-ENV DEBIAN_FRONTEND=noninteractive
 ENV OES_LOGLEVEL INFO
+
+RUN /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata"
+RUN ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+RUN dpkg-reconfigure --frontend noninteractive tzdata
 
 # Setup flask application
 RUN mkdir -p /deploy/app
