@@ -58,7 +58,7 @@ def downloadsrtm(xy_range):
                 log.debug("File {} already esists.".format(link.text))
             
 
-def raster2pgsql(xy_range):
+def raster2pgsql(xy_range=[[0,72], [0,24]]):
     """
     Imports SRTM v4.1 tiles to PostGIS.
     
@@ -94,7 +94,6 @@ def raster2pgsql(xy_range):
             cmd_raster2pgsql = cmd_raster2pgsql.format(**{'filename': filename,
                                                           'tablename':pg_settings['table_name']},
                                                        **pg_settings)
-            log.debug(cmd_raster2pgsql)
             subprocess.check_call(cmd_raster2pgsql, 
                                              stdout=subprocess.DEVNULL, 
                                              stderr=subprocess.PIPE,
