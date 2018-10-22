@@ -54,11 +54,9 @@ Run Docker container
 1. Customize `ops_settings_docker.yml` to your needs.
 
 2. Build container
-
    ``sudo docker-compose up -d``
 
 3. Create the database
-
    ``sudo docker exec run -t flask create``
 
 4. Download SRTM data
