@@ -24,6 +24,8 @@ def download(xyrange):
     """
     
     filestreams.downloadsrtm(_arg_format(xyrange))
+    log.info("Downloaded all files")
+    
 
 @app.cli.command()
 def create():
