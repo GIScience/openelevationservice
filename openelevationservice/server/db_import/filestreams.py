@@ -90,20 +90,15 @@ def raster2pgsql(xy_range=[[0,72], [0,24]]):
                                            '{:02d}'.format(y)
                                            ])
                                             + '.tif')
-            
-            cmd_raster2pgsql = cmd_raster2pgsql.format(**{'filename': filename,
-                                                          'tablename':pg_settings['table_name']},
-                                                       **pg_settings)
-            subprocess.check_call(cmd_raster2pgsql, 
-                                             stdout=subprocess.DEVNULL, 
-                                             stderr=subprocess.PIPE,
-                                             shell=True,
-                                             env=env_current
-                                             )
-            
-#            stdout, stderr = raster2pgsql.communicate()
-#            
-#            if raster2pgsql.returncode != 0:
-#                raise subprocess.CalledProcessError(1, cmd_raster2pgsql.decode('utf-8'))
+            if path.exists(filename):
+                cmd_raster2pgsql = cmd_raster2pgsql.format(**{'filename': filename,
+                                                              'tablename':pg_settings['table_name']},
+                                                           **pg_settings)
+                subprocess.check_call(cmd_raster2pgsql, 
+                                                 stdout=subprocess.DEVNULL, 
+                                                 stderr=subprocess.PIPE,
+                                                 shell=True,
+                                                 env=env_current
+                                                 )
                 
-            log.debug("Imported file {}".format(filename))
+                log.debug("Imported file {}".format(filename))
