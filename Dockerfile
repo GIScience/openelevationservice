@@ -12,8 +12,10 @@ RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
+# oes variables
 ENV OES_LOGLEVEL INFO
 ENV APP_SETTINGS openelevationservice.server.config.ProductionConfig
+ENV FLASK_APP manage
 
 # tzdata is being annoying otherwise
 RUN /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata"
