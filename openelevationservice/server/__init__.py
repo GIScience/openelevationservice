@@ -17,7 +17,7 @@ def create_app(script_info=None):
     
     app = Flask(__name__)
     
-    cors = CORS(app, resources={r"/pois/*": {"origins": "*"}})
+    cors = CORS(app, resources={r"/elevation/*": {"origins": "*"}})
 
     app.config['SWAGGER'] = {
         'title': 'openelevationservice',
