@@ -72,6 +72,13 @@ Run Docker container
 
 After it's all finished, the service will listen on port ``5020`` of you host machine, unless specified differently in ``docker-compose.yml``
 
+
+.. _`Kartoza's docker`: https://github.com/kartoza/docker-postgis
+.. _here: https://harvestchoice.wufoo.com/forms/download-cgiarcsi-srtm/
+.. _`FTP site`: http://data.cgiar-csi.org/srtm/tiles/GeoTIFF/
+.. _`CGIAR website`: http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp
+
+
 Conventional installation
 ####################################################
 
@@ -154,7 +161,4 @@ Quick overview:
 ``elevation/line``
 ###########################################################
 
-.. _`Kartoza's docker`: https://github.com/kartoza/docker-postgis
-.. _here: https://harvestchoice.wufoo.com/forms/download-cgiarcsi-srtm/
-.. _`FTP site`: http://data.cgiar-csi.org/srtm/tiles/GeoTIFF/
-.. _`CGIAR website`: http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp
+sample text
