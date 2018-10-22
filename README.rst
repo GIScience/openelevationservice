@@ -49,29 +49,31 @@ Prerequisites
 - PostGIS installation (recommended `Kartoza's docker`_)
 
 Run Docker container
-+++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 1. Customize `ops_settings_docker.yml` to your needs.
 
 2. Build container
+
 ``sudo docker-compose up -d``
 
 3. Create the database
+
 ``sudo docker exec run -t flask create``
 
 4. Download SRTM data
     
-    **Note**, that you need to have credentials to access the `FTP site`_ , which you can request here_.
-    
-    ``sudo docker exec -d flask download --xyrange=0,0,73,25``
-    
-    The optinal ``xyrange`` parameter specfies the ``minx,miny,maxx,maxy`` indices of the available tiles, default is ``0,0,73,25``. You can see a representation of indices in the map on the `CGIAR website`_.
+**Note**, that you need to have credentials to access the `FTP site`_ , which you can request here_.
+
+``sudo docker exec -d flask download --xyrange=0,0,73,25``
+
+The optinal ``xyrange`` parameter specfies the ``minx,miny,maxx,maxy`` indices of the available tiles, default is ``0,0,73,25``. You can see a representation of indices in the map on the `CGIAR website`_.
     
 5. Import SRTM data
     
-    ``sudo docker exec -d flask importdata --xyrange=0,0,73,25``
-    
-    Now, it's time to grab a coffee, this might take a while. Expect 12 hours for a remote database connection with HDD's and the global dataset.
+``sudo docker exec -d flask importdata --xyrange=0,0,73,25``
+
+Now, it's time to grab a coffee, this might take a while. Expect 12 hours for a remote database connection with HDD's and the global dataset.
     
 
 .. _`Kartoza's docker`: https://github.com/kartoza/docker-postgis
