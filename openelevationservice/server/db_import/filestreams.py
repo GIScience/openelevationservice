@@ -90,6 +90,7 @@ def raster2pgsql(xy_range=[[0,72], [0,24]]):
                                            '{:02d}'.format(y)
                                            ])
                                             + '.tif')
+            log.debug(filename)
             if path.exists(filename):
                 cmd_raster2pgsql = cmd_raster2pgsql.format(**{'filename': filename,
                                                               'tablename':pg_settings['table_name']},
