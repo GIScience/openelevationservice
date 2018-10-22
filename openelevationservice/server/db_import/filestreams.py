@@ -81,8 +81,6 @@ def raster2pgsql(xy_range):
     # -P: pad tiles to guarantee all tiles have the same width and height
     # -M: vacuum analyze after import
     # -t: specifies the pixel size of each row. Important to keep low for performance!
-  
-    cmd_psql = ""
     
     for x in range(*xy_range[0]):
         for y in range(*xy_range[1]):
@@ -96,17 +94,17 @@ def raster2pgsql(xy_range):
             cmd_raster2pgsql = cmd_raster2pgsql.format(**{'filename': filename,
                                                           'tablename':pg_settings['table_name']},
                                                        **pg_settings)
-            
-            raster2pgsql = subprocess.Popen(cmd_raster2pgsql, 
+            log.debug(cmd_raster2pgsql  )
+            subprocess.check_call(cmd_raster2pgsql, 
                                              stdout=subprocess.DEVNULL, 
                                              stderr=subprocess.PIPE,
                                              shell=True,
                                              env=env_current
                                              )
             
-            stdout, stderr = raster2pgsql.communicate()
+#            stdout, stderr = raster2pgsql.communicate()
 #            
-            if raster2pgsql.returncode != 0:
-                raise subprocess.CalledProcessError(1, cmd_raster2pgsql + cmd_psql)
+#            if raster2pgsql.returncode != 0:
+#                raise subprocess.CalledProcessError(1, cmd_raster2pgsql.decode('utf-8'))
                 
             log.debug("Imported file {}".format(filename))
