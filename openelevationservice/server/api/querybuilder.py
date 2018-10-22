@@ -13,15 +13,24 @@ log = get_logger(__name__)
 
 coord_precision = SETTINGS['coord_precision']
 
-def line_elevation(geometry, format_out):
+def _getModel(dataset):
+    """Choose model based on dataset parameter"""
+    if dataset == 'srtm':
+        model = Cgiar
+    
+    return model
+
+def line_elevation(geometry, format_out, dataset):
+    
+    Model = _getModel(dataset)
     
     if geometry.geom_type == 'LineString':
         query_points2d = db.session.query(func.ST_SetSRID((ST_DumpPoints(geometry.wkt).geom), 4326).label('geom')).subquery().alias('points2d')
     
         query_getelev = db.session \
                             .query(query_points2d.c.geom,
-                                   Cgiar.rast.ST_Value(query_points2d.c.geom).label('z')) \
-                            .filter(ST_Intersects(Cgiar.rast, query_points2d.c.geom)) \
+                                   Model.rast.ST_Value(query_points2d.c.geom).label('z')) \
+                            .filter(ST_Intersects(Model.rast, query_points2d.c.geom)) \
                             .subquery().alias('getelevation')
         
         query_points3d = db.session \
@@ -42,10 +51,15 @@ def line_elevation(geometry, format_out):
     else:
         raise InvalidUsage(500, 4002, "Needs to be a LineString, not {}!".format(geometry.geom_type))
         
-    
-    return query_final[0][0]
+    try:
+        return query_final[0][0]
+    except:
+        raise InvalidUsage(500, 4002,
+                           'The requested geometry is outside the bounds of {}'.format(dataset))
 
-def point_elevation(geometry, format_out):
+def point_elevation(geometry, format_out, dataset):
+    
+    Model = _getModel(dataset)
     
     if geometry.geom_type == "Point":
         query_point2d = db.session \
@@ -55,8 +69,8 @@ def point_elevation(geometry, format_out):
         
         query_getelev = db.session \
                             .query(query_point2d.c.geom,
-                                   ST_Value(Cgiar.rast, query_point2d.c.geom).label('z')) \
-                            .filter(ST_Intersects(Cgiar.rast, query_point2d.c.geom)) \
+                                   ST_Value(Model.rast, query_point2d.c.geom).label('z')) \
+                            .filter(ST_Intersects(Model.rast, query_point2d.c.geom)) \
                             .subquery().alias('getelevation')
         
         if format_out == 'geojson': 
@@ -74,6 +88,9 @@ def point_elevation(geometry, format_out):
     else:
         raise InvalidUsage(500, 4002, "Needs to be a Point, not {}!".format(geometry.geom_type))
     
-        
-    return query_final[0][0]
+    try:
+        return query_final[0][0]
+    except:
+        raise InvalidUsage(500, 4002,
+                           'The requested geometry is outside the bounds of {}'.format(dataset))
                                    

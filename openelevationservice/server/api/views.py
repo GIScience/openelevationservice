@@ -33,12 +33,15 @@ def elevationline():
     if 'format_out' not in req_args:
         req_args['format_out'] = 'geojson'
     format_out = req_args['format_out']
+    if 'dataset' not in req_args:
+        req_args['dataset'] = 'srtm'
+    dataset = req_args['dataset']
       
     # Get the geometry
     if format_in == 'geojson':
         geom = convert.geojson_to_geometry(geometry_str)
     elif format_in == 'encodedpolyline':
-        geom = convert.decode_polyline(geometry_str)
+        geom = convert.decode_polyline(geometry_str, False)
     elif format_in == 'linestring':
         geom = convert.polyline_to_geometry(geometry_str)
         
@@ -48,7 +51,7 @@ def elevationline():
                                           message='Maximum number of nodes exceeded.')
                 
     results = ResponseBuilder().__dict__
-    results['geometry'] = querybuilder.line_elevation(geom, format_out)
+    results['geometry'] = querybuilder.line_elevation(geom, format_out, dataset)
     
     # decision tree for format_out
     if format_out != 'geojson':
@@ -82,6 +85,9 @@ def elevationpoint():
         if 'format_out' not in req_args:
             req_args['format_out'] = 'geojson'
         format_out = req_args['format_out']
+        if 'dataset' not in req_args:
+            req_args['dataset'] = 'srtm'
+        dataset = req_args['dataset']
             
         # Get the geometry
         if format_in == 'geojson':
@@ -98,6 +104,9 @@ def elevationpoint():
         if 'format_out' not in req_args:
             req_args['format_out'] = ['geojson']
         format_out = req_args['format_out'][0]
+        if 'dataset' not in req_args:
+            req_args['dataset'] = ['srtm']
+        dataset = req_args['dataset'][0]
         try:
             # Catch errors when parsing the input string
             point_coords = [float(x) for x in req_geometry.split(',')]
@@ -110,7 +119,7 @@ def elevationpoint():
     
     # Build response with attribution etc.
     results = ResponseBuilder().__dict__
-    results['geometry'] = querybuilder.point_elevation(geom, format_out)
+    results['geometry'] = querybuilder.point_elevation(geom, format_out, dataset)
     
     if format_out != 'geojson':
         geom_out = wkt.loads(results['geometry'])
