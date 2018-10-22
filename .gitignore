@@ -4,4 +4,5 @@
 tiles/
 *.log
 openelevationservice/server/ops_settings.yml
+ops_settings_docker.yml
 test.py
