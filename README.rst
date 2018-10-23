@@ -48,12 +48,12 @@ Run Docker container
    ``sudo docker exec run -t flask create``
 
 4. Download SRTM data ``sudo docker exec -dt flask download --xyrange=0,0,73,25``
-    
+
    The optional ``xyrange`` parameter specfies the ``minx,miny,maxx,maxy`` indices of the available tiles, default is ``0,0,73,25``. You can see a representation of indices in the map on the `CGIAR website`_.
 
    **Note**, that you need to have credentials to access the `FTP site`_ , which you can request here_.
 
-    
+
 5. Import SRTM data ``sudo docker exec -d flask importdata --xyrange=0,0,73,25``
 
    Now, it's time to grab a coffee, this might take a while. Expect 12 hours for a remote database connection with HDD's and the global dataset.
@@ -70,7 +70,7 @@ After it's all finished, the service will listen on port ``5020`` of you host ma
 Conventional installation
 ####################################################
 
-This tutorial assumes a Ubuntu system. 
+This tutorial assumes a Ubuntu system.
 
 Max OSX should be similar, if not the same. Windows is of course possible, but many of the commands will have to be altered.
 
@@ -94,27 +94,27 @@ Then you can set up the environment:
    # Either via virtualenv or venv package
    python3.6 -m venv .venv
    virtualenv python=python3.6 .venv
-   
+
+   # Install required packages
+   pip install -r requirements.txt
    # Add FLASK_APP environment variable
    echo "FLASK_APP=manage" >> .venv/bin/activate
    # Activate virtual env
    source .venv/bin/activate
-   # Install required packages
-   pip install -r requirements.txt
-   
+
 When your environment is set up, you can start the import process and start the server:
 
 .. code-block:: bash
-   
+
    # inside the repo root directory
    flask create
    # rather as a background/nohup job, will download 27 GB
    flask download --xyrange=0,0,73,25
    flask importdata
-   
+
    # Start the server
    flask run
-   
+
 
 Endpoints
 ----------------------------------------------------------
@@ -125,6 +125,19 @@ The openelevationservice exposes 2 endpoints:
 - ``/elevation/point``: used for single Point geometries
 
 Quick overview:
+
++-----------------------+-------------------+------------+---------+
+|       Endpoint        | Method(s) allowed | Parameter  | Default |
++=======================+===================+============+=========+
+| ``/elevation/line``   | POST              | format_in  | geojson |
+|                       |                   +------------+---------+
+|                       |                   | geometry   | none    |
+|                       |                   +------------+---------+
+|                       |                   | format_out | geojson |
+|                       |                   +------------+---------|
+|                       |                   | dataset    | srtm    |
++-----------------------+-------------------+------------+---------+
+
 
 ``elevation/line``
 ###########################################################
