@@ -6,11 +6,10 @@ Description
 
 openelevationservice is a Flask application which extracts elevation from various elevation datasets for `Point` or `LineString` 2D geometries and returns 3D geometries in various formats.
 
-Currently, only `SRTM v4.1`_ is supported.
-
-This service is part of the GIScience_ software stack, crafted at `HeiGIT institute`_ at the University of Heidelberg.
+<!-- Currently, only `SRTM v4.1`_ is supported. -->
 
 Supported formats are:
+
 - GeoJSON
 - Polyline, i.e. list of vertices
 - Google's `encoded polyline`_
@@ -18,6 +17,8 @@ Supported formats are:
 
 For general support and questions, please contact our forum_.
 For issues and improvement suggestions, use the repo's `issue tracker`_.
+
+This service is part of the GIScience_ software stack, crafted at `HeiGIT institute`_ at the University of Heidelberg.
 
 .. _GIScience: https://github.com/GIScience
 .. _`HeiGIT institute`: https://heigit.org
