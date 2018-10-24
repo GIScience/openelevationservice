@@ -126,7 +126,7 @@ def elevationpoint():
         geom_out = wkt.loads(results['geometry'])
         results['geometry'] = list(geom_out.coords[0])
 
-    return jsonify(results)
+    return jsonify(json.dumps(results))
             
 
 schema_post = Schema({Required('geometry'): Required(Any(object, list, str)),
