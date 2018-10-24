@@ -42,7 +42,7 @@ def elevationline():
         geom = convert.geojson_to_geometry(geometry_str)
     elif format_in == 'encodedpolyline':
         geom = convert.decode_polyline(geometry_str, False)
-    elif format_in == 'linestring':
+    elif format_in == 'polyline':
         geom = convert.polyline_to_geometry(geometry_str)
         
     if len(list(geom.coords)) > SETTINGS['maximum_nodes']:
@@ -132,11 +132,11 @@ schema_post = Schema({Required('geometry'): Required(Any(object, list, str)),
                      Required('format_in'): Required(Any('geojson',
                                                      'point',
                                                      'encodedpolyline',
-                                                     'linestring')),
+                                                     'polyline')),
                     Optional('format_out'): Required(Any('geojson',
                                                      'point',
                                                      'encodedpolyline',
-                                                     'linestring'))
+                                                     'polyline'))
                      })
 
 # The schema looks so weird, bcs request.args is ImmutableMultiDict, which

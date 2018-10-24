@@ -48,6 +48,7 @@ def polyline_to_geometry(point_list):
     try:
         geom = LineString(point_list)
     except Exception as e:
+        raise
         raise InvalidUsage(status_code=500,
                           error_code=4002,
                           message=str(e))
