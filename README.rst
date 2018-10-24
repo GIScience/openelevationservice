@@ -6,7 +6,7 @@ Description
 
 openelevationservice is a Flask application which extracts elevation from various elevation datasets for `Point` or `LineString` 2D geometries and returns 3D geometries in various formats.
 
-<!-- Currently, only `SRTM v4.1`_ is supported. -->
+<!--- Currently, only `SRTM v4.1`_ is supported. --->
 
 Supported formats are:
 
