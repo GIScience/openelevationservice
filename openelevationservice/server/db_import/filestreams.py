@@ -4,6 +4,7 @@ from openelevationservice import TILES_DIR, SETTINGS
 from openelevationservice.server.utils.logger import get_logger
 
 from os import path, environ, getcwd
+import glob
 import requests
 import subprocess
 import zipfile
@@ -58,7 +59,7 @@ def downloadsrtm(xy_range):
                 log.debug("File {} already esists.".format(link.text))
             
 
-def raster2pgsql(xy_range=[[0,72], [0,24]]):
+def raster2pgsql():
     """
     Imports SRTM v4.1 tiles to PostGIS.
     
@@ -74,7 +75,10 @@ def raster2pgsql(xy_range=[[0,72], [0,24]]):
     env_current = environ.copy()
     env_current['PGPASSWORD'] = pg_settings['password']
     
-    cmd_raster2pgsql = r"raster2pgsql -s 4326 -a -C -P -M -t 50x50 {filename} {tablename} | psql -q -h {host} -p {port} -U {user_name} -d {db_name}"
+    # Tried to import every raster individually by user-specified xyrange 
+    # similar to download(), but raster2pgsql fuck it up somehow.. The PostGIS
+    # raster will not be what one would expect. Instead doing a bulk import of all files.
+    cmd_raster2pgsql = r"raster2pgsql -s 4326 -a -C -M -P -t 50x50 {filename} {tablename} | psql -q -h {host} -p {port} -U {user_name} -d {db_name}"
     # -s: raster SRID
     # -a: append to table (assumes it's been create with 'create()')
     # -C: apply all raster Constraints
@@ -82,24 +86,20 @@ def raster2pgsql(xy_range=[[0,72], [0,24]]):
     # -M: vacuum analyze after import
     # -t: specifies the pixel size of each row. Important to keep low for performance!
     
-    for x in range(*xy_range[0]):
-        for y in range(*xy_range[1]):
-            filename = path.join(TILES_DIR, 
-                                 '_'.join(['srtm',
-                                           '{:02d}'.format(x),
-                                           '{:02d}'.format(y)
-                                           ])
-                                            + '.tif')
-            log.debug(filename)
-            if path.exists(filename):
-                cmd_raster2pgsql = cmd_raster2pgsql.format(**{'filename': filename,
-                                                              'tablename':pg_settings['table_name']},
-                                                           **pg_settings)
-                subprocess.check_call(cmd_raster2pgsql, 
-                                                 stdout=subprocess.DEVNULL, 
-                                                 stderr=subprocess.PIPE,
-                                                 shell=True,
-                                                 env=env_current
-                                                 )
-                
-                log.debug("Imported file {}".format(filename))
+    cmd_raster2pgsql = cmd_raster2pgsql.format(**{'filename': path.join(TILES_DIR, '*.tif'),
+                                                  'tablename':pg_settings['table_name']},
+                                                  **pg_settings)
+    
+    proc = subprocess.Popen(cmd_raster2pgsql, 
+                         stdout=subprocess.PIPE, 
+                         stderr=subprocess.STDOUT,
+                         shell=True,
+                         env=env_current
+                         )
+    
+    for line in proc.stdout:
+        log.debug(line.decode())
+    proc.stdout.close()
+    return_code = proc.wait()
+    if return_code:
+        raise subprocess.CalledProcessError(return_code, cmd_raster2pgsql)

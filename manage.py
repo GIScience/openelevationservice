@@ -44,8 +44,7 @@ def drop():
     
 
 @app.cli.command()
-@click.option('--xyrange', default='0,73,0,25')
-def importdata(xyrange): 
+def importdata(): 
     """
     Imports all data found in ./tiles
     
@@ -55,7 +54,7 @@ def importdata(xyrange):
     """
     log.info("Starting to import data...")
     
-    filestreams.raster2pgsql(_arg_format(xyrange))
+    filestreams.raster2pgsql()
     
     log.info("Imported data successfully!")
     
