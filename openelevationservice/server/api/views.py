@@ -7,6 +7,7 @@ from openelevationservice.server.api import querybuilder
 from openelevationservice.server.api.response import ResponseBuilder
 
 from shapely import wkt
+import json
 from flask import Blueprint, request, jsonify
 from voluptuous import Schema, Required, Any, Optional, REMOVE_EXTRA, MultipleInvalid
     
@@ -62,7 +63,7 @@ def elevationline():
         else:
             results['geometry'] = list(coords)
     
-    return jsonify(results)
+    return jsonify(json.dumps(results))
 
 
 @main_blueprint.route('/elevation/point', methods=['POST', 'GET'])
