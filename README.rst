@@ -12,9 +12,9 @@ This service is part of the GIScience_ software stack, crafted at `HeiGIT instit
 
 Supported formats are:
 - GeoJSON
-- Linestring, i.e. list of vertices
+- Polyline, i.e. list of vertices
 - Google's `encoded polyline`_
-- Point, i.e. vertex
+- Point, i.e. one vertex
 
 For general support and questions, please contact our forum_.
 For issues and improvement suggestions, use the repo's `issue tracker`_.
@@ -57,19 +57,19 @@ Run Docker container
 
     sudo docker exec -it bash -c "source /oes_venv/bin/activate; export OES_LOGLEVEL=DEBUG; flask download --xyrange=0,0,73,25"
 
-   The optional ``xyrange`` parameter specfies the ``minx,miny,maxx,maxy`` indices of the available tiles, default is ``0,0,73,25``. You can see a representation of indices in the map on the `CGIAR website`_.
+The optional ``xyrange`` parameter specfies the ``minx,miny,maxx,maxy`` indices of the available tiles, default is ``0,0,73,25``. You can see a representation of indices in the map on the `CGIAR website`_.
 
-   **Note**, that you need to have credentials to access the `FTP site`_ , which you can request here_.
+**Note**, that you need to have credentials to access the `FTP site`_ , which you can request here_.
 
 5. Import SRTM data
 
 .. code-block:: bash
 
-    sudo docker exec  -it bash -c "source /oes_venv/bin/activate; export OES_LOGLEVEL=DEBUG; flask importdata --xyrange=0,0,73,25"
+    sudo docker exec  -it bash -c "source /oes_venv/bin/activate; export OES_LOGLEVEL=DEBUG; flask importdata"
 
-   Now, it's time to grab a coffee, this might take a while. Expect 12 hours for a remote database connection with HDD's and the global dataset.
+The import command will download whatever ``.tif`` files it finds in ```./tiles```. Now, it's time to grab a coffee, this might take a while. Expect 4-5 hours for a remote database connection with HDD's and the global dataset.
 
-   After it's all finished, the service will listen on port ``5020`` of you host machine, unless specified differently in ``docker-compose.yml``
+After it's all finished, the service will listen on port ``5020`` of you host machine, unless specified differently in ``docker-compose.yml``
 
 
 .. _`Kartoza's docker`: https://github.com/kartoza/docker-postgis
@@ -157,38 +157,75 @@ Endpoints
 
 The openelevationservice exposes 2 endpoints:
 
-- ``/elevation/line``: used for Polyline geometries
+The default base url is ``http://localhost:5000/``.
+
+- ``/elevation/line``: used for LineString geometries
 - ``/elevation/point``: used for single Point geometries
+
 
 Quick overview:
 
-+-----------------------+-------------------+------------+---------+
-|       Endpoint        | Method(s) allowed | Parameter  | Default |
-+=======================+===================+============+=========+
-| ``/elevation/line``   | POST              | format_in  | geojson |
-|                       |                   +------------+---------+
-|                       |                   | geometry   | none    |
-|                       |                   +------------+---------+
-|                       |                   | format_out | geojson |
-|                       |                   +------------+---------+
-|                       |                   | dataset    | srtm    |
-+-----------------------+-------------------+------------+---------+
-| ``/elevation/point``  | GET, POST         | format_in  | geojson |
-|                       |                   +------------+---------+
-|                       |                   | geometry   | none    |
-|                       |                   +------------+---------+
-|                       |                   | format_out | geojson |
-|                       |                   +------------+---------+
-|                       |                   | dataset    | srtm    |
-+-----------------------+-------------------+------------+---------+
++-----------------------+-------------------+------------+---------+--------------------------------------+
+|       Endpoint        | Method(s) allowed | Parameter  | Default | Values                               |
++=======================+===================+============+=========+======================================+
+| ``/elevation/line``   | POST              | format_in  | geojson | geojson, linestring, encodedpolyline |
+|                       |                   +------------+---------+--------------------------------------+
+|                       |                   | geometry   | none    | depends on `format_in`               |
+|                       |                   +------------+---------+--------------------------------------+
+|                       |                   | format_out | geojson | geojson, linestring, encodedpolyline |
+|                       |                   +------------+---------+--------------------------------------+
+|                       |                   | dataset    | srtm    | srtm (so far)                        |
++-----------------------+-------------------+------------+---------+--------------------------------------+
+| ``/elevation/point``  | GET, POST         | format_in  | geojson | geojson, point                       |
+|                       |                   +------------+---------+--------------------------------------+
+|                       |                   | geometry   | none    | depends on ``format_in``             |
+|                       |                   +------------+---------+--------------------------------------+
+|                       |                   | format_out | geojson | geojson, point                       |
+|                       |                   +------------+---------+--------------------------------------+
+|                       |                   | dataset    | srtm    | srtm (so far)                        |
++-----------------------+-------------------+------------+---------+--------------------------------------+
+
+For more detailed information, please visit the `API documentation`_.
+
+.. _`API documentation`: https://coming.soon
 
 
-``/elevation/line``
-###########################################################
+Usage
+--------------------------------------------------------
 
-**URL**: http://localhost:5000/elevation/line
+GET point
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-curl -XPOST http://localhost:5000/elevation/line
+.. code-block:: bash
 
-``/elevation/point``
-###########################################################
+  curl -XGET https://localhost:5000/elevation/point?geometry=13.349762,38.11295
+
+POST point as GeoJSON
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+.. code-block:: bash
+
+  curl -XPOST http://localhost:5000/elevation/point \
+    -H 'Content-Type: application/json' \
+    -d '{
+      "format_in": "geojson",
+      "format_out": "geojson",
+      "geometry": {
+        "coordinates": [13.349762, 38.11295],
+        "type": "Point"
+      }
+    }'
+
+POST LineString as polyline
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+.. code-block:: bash
+
+  curl -XPOST http://localhost:5000/elevation/line \
+    -H 'Content-Type: application/json' \
+    -d '{
+      "format_in": "polyline",
+      "format_out": "encodedpolyline",
+      "geometry": [[13.349762, 38.11295],
+                   [12.638397, 37.645772]]
+    }'
