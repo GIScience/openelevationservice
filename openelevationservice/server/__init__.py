@@ -53,9 +53,9 @@ def create_app(script_info=None):
 
         @app.teardown_request
         def teardown_request(exception=None):
-            # if 'start' in g:
-            diff = time.time() - g.start
-            log.debug("Request took: {} seconds".format(diff))
+            if 'start' in g:
+                diff = time.time() - g.start
+                log.debug("Request took: {} seconds".format(diff))
 
     # error handlers
     @app.errorhandler(400)
