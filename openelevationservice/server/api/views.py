@@ -8,7 +8,7 @@ from openelevationservice.server.api.response import ResponseBuilder
 
 from shapely import wkt
 import json
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, Response
 from voluptuous import Schema, Required, Any, Optional, REMOVE_EXTRA, MultipleInvalid
     
 log = logger.get_logger(__name__)
@@ -52,18 +52,20 @@ def elevationline():
                                           message='Maximum number of nodes exceeded.')
                 
     results = ResponseBuilder().__dict__
-    results['geometry'] = querybuilder.line_elevation(geom, format_out, dataset)
+    geom_queried = querybuilder.line_elevation(geom, format_out, dataset)
     
     # decision tree for format_out
     if format_out != 'geojson':
-        geom_out = wkt.loads(results['geometry'])
+        geom_out = wkt.loads(geom_queried)
         coords = geom_out.coords
         if format_out == 'encodedpolyline':
             results['geometry'] = convert.encode_polyline(coords, True)
         else:
             results['geometry'] = list(coords)
+    else:
+        results['geometry'] = json.loads(geom_queried)
     
-    return jsonify(json.dumps(results))
+    return Response(json.dumps(results), mimetype='application/json; charset=utf-8')
 
 
 @main_blueprint.route('/elevation/point', methods=['POST', 'GET'])
@@ -120,13 +122,15 @@ def elevationpoint():
     
     # Build response with attribution etc.
     results = ResponseBuilder().__dict__
-    results['geometry'] = querybuilder.point_elevation(geom, format_out, dataset)
+    geom_queried = querybuilder.point_elevation(geom, format_out, dataset)
     
     if format_out != 'geojson':
-        geom_out = wkt.loads(results['geometry'])
+        geom_out = wkt.loads(geom_queried)
         results['geometry'] = list(geom_out.coords[0])
+    else:
+        results['geometry'] = json.loads(geom_queried)
 
-    return jsonify(json.dumps(results))
+    return Response(json.dumps(results), mimetype='application/json; charset=utf-8')
             
 
 schema_post = Schema({Required('geometry'): Required(Any(object, list, str)),
