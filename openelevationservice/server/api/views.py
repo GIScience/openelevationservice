@@ -65,7 +65,7 @@ def elevationline():
     else:
         results['geometry'] = json.loads(geom_queried)
     
-    return Response(json.dumps(results), mimetype='application/json; charset=utf-8')
+    return jsonify(results)
 
 
 @main_blueprint.route('/elevation/point', methods=['POST', 'GET'])
@@ -130,7 +130,7 @@ def elevationpoint():
     else:
         results['geometry'] = json.loads(geom_queried)
 
-    return Response(json.dumps(results), mimetype='application/json; charset=utf-8')
+    return jsonify(results)
             
 
 schema_post = Schema({Required('geometry'): Required(Any(object, list, str)),
@@ -163,7 +163,6 @@ def _validate_request(request):
         
         if request.method == 'POST':
             if not 'application/json' in request.headers['Content-Type']:
-                log.debug(request.headers)
                 raise api_exceptions.InvalidUsage(500, 
                                                   4001,
                                                   "Content-Type header is not application/json")
