@@ -3,13 +3,12 @@
 from openelevationservice import SETTINGS
 from openelevationservice.server.api import api_exceptions
 from openelevationservice.server.utils import logger, convert
-from openelevationservice.server.api import querybuilder
+from openelevationservice.server.api import querybuilder, validator
 from openelevationservice.server.api.response import ResponseBuilder
 
 from shapely import wkt
 import json
-from flask import Blueprint, request, jsonify, Response
-from voluptuous import Schema, Required, Any, Optional, REMOVE_EXTRA, MultipleInvalid
+from flask import Blueprint, request, jsonify
     
 log = logger.get_logger(__name__)
 
@@ -23,19 +22,13 @@ def elevationline():
     :returns: elevation response 
     :type: Response
     """
+    # Cerberus validates and returns a processed arg dict
+    req_args = validator.validate_request(request)
     
-    _validate_request(request)
-    
-    req_args = request.get_json(silent=True)
-    
-    # Check incoming parameters
+    # Incoming parameters
     geometry_str = req_args['geometry']
     format_in = req_args['format_in']
-    if 'format_out' not in req_args:
-        req_args['format_out'] = 'geojson'
     format_out = req_args['format_out']
-    if 'dataset' not in req_args:
-        req_args['dataset'] = 'srtm'
     dataset = req_args['dataset']
       
     # Get the geometry
@@ -77,19 +70,14 @@ def elevationpoint():
     :type: Response class
     """
     
-    _validate_request(request)
+    req_args = validator.validate_request(request)
     
     if request.method == 'POST':
-        req_args = request.get_json(silent=True)
         
         # Check incoming parameters
         req_geometry = req_args['geometry']
         format_in = req_args['format_in']
-        if 'format_out' not in req_args:
-            req_args['format_out'] = 'geojson'
         format_out = req_args['format_out']
-        if 'dataset' not in req_args:
-            req_args['dataset'] = 'srtm'
         dataset = req_args['dataset']
             
         # Get the geometry
@@ -101,14 +89,9 @@ def elevationpoint():
         # If request method is GET
         # Coercing request ImmutableMultiDict to dict() makes the values lists,
         # so we have to access the first elements
-        req_args = dict(request.args)
         
         req_geometry = req_args['geometry'][0]
-        if 'format_out' not in req_args:
-            req_args['format_out'] = ['geojson']
         format_out = req_args['format_out'][0]
-        if 'dataset' not in req_args:
-            req_args['dataset'] = ['srtm']
         dataset = req_args['dataset'][0]
         try:
             # Catch errors when parsing the input string
@@ -132,44 +115,4 @@ def elevationpoint():
 
     return jsonify(results)
             
-
-schema_post = Schema({Required('geometry'): Required(Any(object, list, str)),
-                     Required('format_in'): Required(Any('geojson',
-                                                     'point',
-                                                     'encodedpolyline',
-                                                     'polyline')),
-                    Optional('format_out'): Required(Any('geojson',
-                                                     'point',
-                                                     'encodedpolyline',
-                                                     'polyline'))
-                     })
-
-# The schema looks so weird, bcs request.args is ImmutableMultiDict, which
-# has listed values when coerced to dict()                     
-schema_get = Schema({Required('geometry'): str,
-                     Optional('format_out'): Required(Any('geojson', 'point'))}, extra=REMOVE_EXTRA)
-
-def _validate_request(request):
-    """
-    Validates for emptiness and application/json in header
-    
-    :param request: POST or GET request from user
-    :type request: Flask request
-    """        
-    
-    try:
-        if request.method == 'GET':
-            schema_get(request.args.to_dict())
-        
-        if request.method == 'POST':
-            if not 'application/json' in request.headers['Content-Type']:
-                raise api_exceptions.InvalidUsage(500, 
-                                                  4001,
-                                                  "Content-Type header is not application/json")
-            schema_post(request.get_json())   
-    except MultipleInvalid as e:
-        raise api_exceptions.InvalidUsage(500,
-                                          4000,
-                                          str(e))
-
-    
+   
