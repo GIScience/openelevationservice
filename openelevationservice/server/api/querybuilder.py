@@ -49,13 +49,13 @@ def line_elevation(geometry, format_out, dataset):
             query_final = db.session \
                               .query(func.ST_AsText(ST_SnapToGrid(func.ST_MakeLine(query_points3d.c.geom), coord_precision)))
     else:
-        raise InvalidUsage(500, 4002, "Needs to be a LineString, not {}!".format(geometry.geom_type))
+        raise InvalidUsage(500, 4002, "Needs to be a LineString, not a {}!".format(geometry.geom_type))
         
-    try:
-        return query_final[0][0]
-    except:
+    if query_final[0][0] == None:
         raise InvalidUsage(500, 4002,
                            'The requested geometry is outside the bounds of {}'.format(dataset))
+    
+    return query_final[0][0]
 
 def point_elevation(geometry, format_out, dataset):
     
