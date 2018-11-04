@@ -100,3 +100,18 @@ class LineTest(BaseTestCase):
         self.assertRaises(api_exceptions.InvalidUsage)
         self.assertEqual(response.get_json()['code'], 4002)
         self.assertIn(b'not a Point', response.data)
+    
+    def test_one_invalid_vertex(self):
+        mixed_coords = [valid_coords[0], invalid_coords[0]]
+        print(mixed_coords)
+        mixed_geojson = valid_line_geojson
+        mixed_geojson.update(geometry={'coordinates': mixed_coords, 'type': 'LineString'})
+        response = self.client.post('elevation/line',
+                                    json=mixed_geojson,
+                                    )
+        
+        print(response.get_json())
+        
+        self.assertRaises(api_exceptions.InvalidUsage)
+        self.assertEqual(response.get_json()['code'], 4002)
+        self.assertIn(b'At least one vertex is outside the bounds', response.data)
