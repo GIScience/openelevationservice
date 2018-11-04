@@ -42,7 +42,7 @@ Prerequisites
 Run Docker container
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-1. Customize `ops_settings_docker.yml` to your needs.
+1. Customize `ops_settings_docker.sample.yml` to your needs and name it `ops_settings_docker.yml`
 
 2. Build container
    ``sudo docker-compose up -d``
@@ -66,9 +66,9 @@ The optional ``xyrange`` parameter specfies the ``minx,miny,maxx,maxy`` indices 
 
     sudo docker exec  -it bash -c "source /oes_venv/bin/activate; export OES_LOGLEVEL=DEBUG; flask importdata"
 
-The import command will download whatever ``.tif`` files it finds in ```./tiles```. Now, it's time to grab a coffee, this might take a while. Expect 4-5 hours for a remote database connection with HDD's and the global dataset.
+The import command will import whatever ``.tif`` files it finds in ``./tiles``. Now, it's time to grab a coffee, this might take a while. Expect a few hours for a remote database connection with HDD's and the global dataset.
 
-After it's all finished, the service will listen on port ``5020`` of you host machine, unless specified differently in ``docker-compose.yml``
+After it's all finished, the service will listen on port ``5020`` of your host machine, unless specified differently in ``docker-compose.yml``
 
 
 .. _`Kartoza's docker`: https://github.com/kartoza/docker-postgis
@@ -103,7 +103,9 @@ Then you can set up the environment:
    cd openelevationservice
    # Either via virtualenv, venv package or conda
    python3.6 -m venv .venv
+   # or
    virtualenv python=python3.6 .venv
+   # or
    conda create -n oes python=3.6
 
    # Install required packages
@@ -114,7 +116,7 @@ Then you can set up the environment:
    # Activate virtual env (or equivalent conda command)
    source .venv/bin/activate
 
-When your environment is set up, you can start the import process and start the server:
+When your environment is set up, you can run the import process and start the server:
 
 .. code-block:: bash
 
@@ -127,42 +129,17 @@ When your environment is set up, you can start the import process and start the 
    # Start the server
    flask run
 
-
-Environment variables
-##########################################################
-
-openelevationservice recognizes the following environment variables:
-
-+-----------------+-----------------------------------------+-------------------------------------------------------+-----------------------------+
-|     variable    |       function                          |     Default                                           |  Values                     |
-+-----------------+-----------------------------------------+-------------------------------------------------------+-----------------------------+
-| OES_LOGLEVEL    | Sets the level of logging output        | INFO                                                  | DEBUG, INFO, WARNING, ERROR |
-+-----------------+-----------------------------------------+-------------------------------------------------------+-----------------------------+
-| APP_SETTINGS    | Controls the behavior of ``config.py``  | openelevationservice.server.config.ProductionConfig   | ProductionConfig,           |
-|                 |                                         |                                                       |                             |
-|                 |                                         | openelevationservice.server.config.DevelopmentConfig  | DevelopmentConfig           |
-+-----------------+-----------------------------------------+-------------------------------------------------------+-----------------------------+
-| FLASK_APP       | Sets the app                            | manage                                                |                             |
-+-----------------+-----------------------------------------+-------------------------------------------------------+-----------------------------+
-| FLASK_ENV       | Development/Production server           | development                                           | production, development     |
-+-----------------+-----------------------------------------+-------------------------------------------------------+-----------------------------+
-| TESTING         | Sets flask testing environment          | None                                                  | true                        |
-+-----------------+-----------------------------------------+-------------------------------------------------------+-----------------------------+
-
-In the case of the Docker setup, you don't need to worry about environment variables for the most part.
+The service will now listen on ```http://localhost:5000``.
 
 Endpoints
 ----------------------------------------------------------
 
-The openelevationservice exposes 2 endpoints:
-
 The default base url is ``http://localhost:5000/``.
+
+The openelevationservice exposes 2 endpoints:
 
 - ``/elevation/line``: used for LineString geometries
 - ``/elevation/point``: used for single Point geometries
-
-
-Quick overview:
 
 +-----------------------+-------------------+------------+---------+--------------------------------------+
 |       Endpoint        | Method(s) allowed | Parameter  | Default | Values                               |
@@ -188,6 +165,28 @@ For more detailed information, please visit the `API documentation`_.
 
 .. _`API documentation`: https://coming.soon
 
+Environment variables
+##########################################################
+
+openelevationservice recognizes the following environment variables:
+
++-----------------+-----------------------------------------+-------------------------------------------------------+-----------------------------+
+|     variable    |       function                          |     Default                                           |  Values                     |
++-----------------+-----------------------------------------+-------------------------------------------------------+-----------------------------+
+| OES_LOGLEVEL    | Sets the level of logging output        | INFO                                                  | DEBUG, INFO, WARNING, ERROR |
++-----------------+-----------------------------------------+-------------------------------------------------------+-----------------------------+
+| APP_SETTINGS    | Controls the behavior of ``config.py``  | openelevationservice.server.config.ProductionConfig   | ProductionConfig,           |
+|                 |                                         |                                                       |                             |
+|                 |                                         |                                                       | DevelopmentConfig           |
++-----------------+-----------------------------------------+-------------------------------------------------------+-----------------------------+
+| FLASK_APP       | Sets the app                            | manage                                                |                             |
++-----------------+-----------------------------------------+-------------------------------------------------------+-----------------------------+
+| FLASK_ENV       | Development/Production server           | development                                           | production, development     |
++-----------------+-----------------------------------------+-------------------------------------------------------+-----------------------------+
+| TESTING         | Sets flask testing environment          | None                                                  | true                        |
++-----------------+-----------------------------------------+-------------------------------------------------------+-----------------------------+
+
+In the case of the Docker setup, you don't need to worry about environment variables for the most part.
 
 Usage
 --------------------------------------------------------

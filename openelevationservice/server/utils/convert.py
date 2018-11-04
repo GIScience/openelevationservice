@@ -13,6 +13,9 @@ def geojson_to_geometry(geometry_str):
     
     :param geometry_str: GeoJSON representation to be converted
     :type geometry_str: str
+    
+    :returns: Shapely geometry
+    :rtype: Shapely geometry
     """
     
     try:
@@ -30,6 +33,9 @@ def point_to_geometry(point):
     
     :param point: coordinates of a point
     :type point: list/tuple
+    
+    :returns: Point
+    :rtype: shapely.geometry.Point
     """
     
     try:
@@ -46,6 +52,9 @@ def polyline_to_geometry(point_list):
     
     :param point_list: Coordinates of line to be converted.
     :type point_list: list/tuple of lists/tuples
+    
+    :returns: LineString
+    :rtype: shapely.geometry.LineString
     """
     
     try:
@@ -66,7 +75,8 @@ def decode_polyline(polyline, is3D):
     :param polyline: An encoded polyline, only the geometry.
     :type polyline: string
     
-    :rtype: shapely.geometry.LineString object
+    :returns: LineString in 2D or 3D
+    :rtype: shapely.geometry.LineString
     """
     points = []
     index = lat = lng = z= 0
@@ -128,7 +138,10 @@ def encode_polyline(coords, is3D):
     :type coords: tuple/list of tuples/lists
     
     :param is3D: switch for polylines with elevation data
-    :typ id3D: boolean
+    :type id3D: boolean
+    
+    :returns: encoded polyline
+    :rtype: string
     """
     result = []
     

@@ -8,19 +8,44 @@ from openelevationservice.server.api.api_exceptions import InvalidUsage
 
 from geoalchemy2.functions import ST_DumpPoints, ST_Value, ST_Intersects, ST_X, ST_Y
 from sqlalchemy import func
+import json
 
 log = get_logger(__name__)
 
 coord_precision = SETTINGS['coord_precision']
 
 def _getModel(dataset):
-    """Choose model based on dataset parameter"""
+    """
+    Choose model based on dataset parameter
+    
+    :param dataset: elevation dataset to use for querying
+    :type dataset: string
+    
+    :returns: database model
+    :rtype: SQLAlchemy model
+    """
     if dataset == 'srtm':
         model = Cgiar
     
     return model
 
 def line_elevation(geometry, format_out, dataset):
+    """
+    Performs PostGIS query to enrich a line geometry.
+    
+    :param geometry: Input 2D line to be enriched with elevation
+    :type geometry: Shapely geometry
+    
+    :param format_out: Specifies output format. One of ['geojson', 'polyline',
+        'encodedpolyline']
+    :type format_out: string
+    
+    :param dataset: Elevation dataset to use for querying
+    :type dataset: string
+    
+    :returns: 3D line as GeoJSON or WKT
+    :rtype: string
+    """
     
     Model = _getModel(dataset)
     
@@ -41,7 +66,7 @@ def line_elevation(geometry, format_out, dataset):
                             .subquery().alias('points3d')
         
         if format_out == 'geojson':
-            # Return GeoJSON when requested directly in PostGIS
+            # Return GeoJSON directly in PostGIS
             query_final = db.session \
                               .query(func.ST_AsGeoJSON(ST_SnapToGrid(func.ST_MakeLine(query_points3d.c.geom), coord_precision)))
         else:
@@ -54,10 +79,29 @@ def line_elevation(geometry, format_out, dataset):
     if query_final[0][0] == None:
         raise InvalidUsage(500, 4002,
                            'The requested geometry is outside the bounds of {}'.format(dataset))
-    
+    # Behaviour when one vertex is out of bounds
+    elif query_final[0][0] == "LINESTRING Z EMPTY" or json.loads(query_final[0][0])['coordinates'] == []:
+        raise InvalidUsage(500, 4002,
+                           'At least one vertex is outside the bounds of {}'.format(dataset))
+        
     return query_final[0][0]
 
 def point_elevation(geometry, format_out, dataset):
+    """
+    Performs PostGIS query to enrich a point geometry.
+    
+    :param geometry: Input point to be enriched with elevation
+    :type geometry: shapely.geometry.Point
+    
+    :param format_out: Specifies output format. One of ['geojson', 'point']
+    :type format_out: string
+    
+    :param dataset: Elevation dataset to use for querying
+    :type dataset: string
+    
+    :returns: 3D Point as GeoJSON or WKT
+    :rtype: string
+    """
     
     Model = _getModel(dataset)
     
