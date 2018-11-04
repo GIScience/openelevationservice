@@ -18,10 +18,8 @@ class BaseTestCase(TestCase):
 
         return app
 
-    def setUp(self):
-        db.init_app(self.app)
+    def setUp(self):            
         db.create_all()
-        
         # Imports Sicily as raster, rather low-weight
         if not path.exists(path.join(TILES_DIR, 'srtm_39_05.tif')):
             test_range = [[39,40],[5,6]]
