@@ -20,7 +20,7 @@ def elevationline():
     Function called when user posts to /elevation/line.
 
     :returns: elevation response 
-    :type: Response
+    :rtype: Response
     """
     # Cerberus validates and returns a processed arg dict
     req_args = validator.validate_request(request)
@@ -67,7 +67,7 @@ def elevationpoint():
     Function called when user posts to/gets /elevation/point.
 
     :returns: elevation response 
-    :type: Response class
+    :rtype: Response class
     """
     
     req_args = validator.validate_request(request)
