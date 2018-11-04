@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from openelevationservice.server.api.api_exceptions import InvalidUsage
+from openelevationservice.server.utils import logger
 
 from shapely.geometry import shape, LineString, Point
+
+log = logger.get_logger(__name__)
 
 def geojson_to_geometry(geometry_str):
     """
@@ -48,7 +51,6 @@ def polyline_to_geometry(point_list):
     try:
         geom = LineString(point_list)
     except Exception as e:
-        raise
         raise InvalidUsage(status_code=500,
                           error_code=4002,
                           message=str(e))
@@ -56,7 +58,7 @@ def polyline_to_geometry(point_list):
     
     
 def decode_polyline(polyline, is3D):
-    """Decodes a Polyline string into a GeoJSON structure.
+    """Decodes a Polyline string into a shapely.geometry.LineString.
     
     After GraphHopper's Java code:
     https://github.com/graphhopper/graphhopper/blob/13ed18d4cc22d9c4c61b5a1de59dd2ff2e1c105d/web/src/main/java/com/graphhopper/http/WebHelper.java#L49
@@ -64,7 +66,7 @@ def decode_polyline(polyline, is3D):
     :param polyline: An encoded polyline, only the geometry.
     :type polyline: string
     
-    :rtype: dict as GeoJSON geometry
+    :rtype: shapely.geometry.LineString object
     """
     points = []
     index = lat = lng = z= 0
@@ -112,7 +114,7 @@ def decode_polyline(polyline, is3D):
         else:
             points.append([round(lng * 1e-5, 6), round(lat * 1e-5, 6)])
         
-    return points
+    return polyline_to_geometry(points)
 
 
 def encode_polyline(coords, is3D):
