@@ -13,7 +13,8 @@ Supported formats are:
 - Google's `encoded polyline`_
 - Point, i.e. one vertex
 
-For general support and questions, please contact our forum_.
+For general support and questions, please contact our forum_. After successful installation, you can also find a API documentation locally at https://localhost:5000/apidocs, provided via flasgger_.
+
 For issues and improvement suggestions, use the repo's `issue tracker`_.
 
 This service is part of the GIScience_ software stack, crafted at `HeiGIT institute`_ at the University of Heidelberg.
@@ -24,6 +25,7 @@ This service is part of the GIScience_ software stack, crafted at `HeiGIT instit
 .. _`encoded polyline`: https://developers.google.com/maps/documentation/utilities/polylinealgorithm
 .. _forum: https://ask.openrouteservice.org/c/elevation
 .. _`issue tracker`: https://github.com/GIScience/openelevationservice/issues
+.. _flasgger: https://github.com/rochacbruno/flasgger
 
 Installation
 ----------------------------------------------------
@@ -162,6 +164,8 @@ The openelevationservice exposes 2 endpoints:
 +-----------------------+-------------------+------------+---------+--------------------------------------+
 
 For more detailed information, please visit the `API documentation`_.
+
+When hosted locally, visit https://localhost:5000/apidocs.
 
 .. _`API documentation`: https://coming.soon
 
