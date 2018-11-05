@@ -1,6 +1,4 @@
 swagger: "2.0"
-tags:
-- name: "Pois"
 info:
   description: |
             Returns elevation for point or line geometries by building 3D geometries from freely available data sources.
@@ -20,103 +18,55 @@ produces:
 host: "api.openrouteservice.org"
 security:
 - UserSecurity: [api_key]
+securityDefinitions:
+  UserSecurity:
+    name: "api_key"
+    description: |
+      Add your API Key as the value of the api_key parameter to your request.
+    type: "apiKey"
+    in: "query"
+responses:
+  success:
+    description: "Standard response for successfully processed requests."
+    schema:
+      $ref: "#/definitions/GeoJSONResponse"
+  authmissing:
+    description: "Authorization field missing."
+  notauthorized:
+    description: "Key not authorised."
+  serverissue:
+    description: |
+      An unexpected error was encountered and more detailed internal
+      errorcode is provided.
+      | Internal Code | Description                                        |
+      |:-------------:|----------------------------------------------------|
+      | 4001 |  ValueError in parameters |
+      | 4002 |  Wrong HTTP headers |
+      | 4003 |  Problems with the provided geometry |
+      | 4004 |  Exceeded the number of allowed vertices |
 paths:
-  "/pois":
+  "/elevation/line":
     post:
+      summary:  "Enrich 2D lines with elevation."
       description: |
-        Examples:
+        This endpoint can take planar 2D line objects and enrich them with elevation from a variety of datasets.
+
+        The input and output formats are:
+          * GeoJSON
+          * Polyline
+          * <a href="https://developers.google.com/maps/documentation/utilities/polylinealgorithm">Google's Encoded polyline</a>
+
+        Example:
         ```
-        ##### POIS around a buffered point
-        curl -X POST \
-          https://api.openrouteservice.org/pois?api_key=INSERT_YOUR_KEY \
-          -H 'Content-Type: application/json' \
-          -d '{
-          "request": "pois",
-          "geometry": {
-            "bbox": [
-              [8.8034, 53.0756],
-              [8.7834, 53.0456]
-            ],
-            "geojson": {
-              "type": "Point",
-              "coordinates": [8.8034, 53.0756]
-            },
-            "buffer": 250
-          }
-        }'
-
-        ##### POIs of given categories
-        curl -X POST \
-          https://api.openrouteservice.org/pois?api_key=INSERT_YOUR_KEY \
-          -H 'Content-Type: application/json' \
-          -d '{
-          "request": "pois",
-          "geometry": {
-            "bbox": [
-              [8.8034, 53.0756],
-              [8.7834, 53.0456]
-            ],
-            "geojson": {
-              "type": "Point",
-              "coordinates": [8.8034, 53.0756]
-            },
-            "buffer": 100
-          },
-          "limit": 200,
-          "filters": {
-            "category_ids": [180, 245]
-          }
-        }'
-
-        ##### POIs of given category groups
-        curl -X POST \
-          https://api.openrouteservice.org/pois?api_key=INSERT_YOUR_KEY \
-          -H 'Content-Type: application/json' \
-          -d '{
-          "request": "pois",
-          "geometry": {
-            "bbox": [
-              [8.8034, 53.0756],
-              [8.7834, 53.0456]
-            ],
-            "geojson": {
-              "type": "Point",
-              "coordinates": [8.8034, 53.0756]
-            },
-            "buffer": 100
-          },
-          "limit": 200,
-          "filters": {
-            "category_group_ids": [160]
-          }
-        }'
-
-        ##### POI Statistics
-        curl -X POST \
-          https://api.openrouteservice.org/pois?api_key=INSERT_YOUR_KEY \
-          -H 'Content-Type: application/json' \
-          -d '{
-          "request": "stats",
-          "geometry": {
-            "bbox": [
-              [8.8034, 53.0756],
-              [8.7834, 53.0456]
-            ],
-            "geojson": {
-              "type": "Point",
-              "coordinates": [8.8034, 53.0756]
-            },
-            "buffer": 100
-          }
-        }'
-
-        ##### POI Categories as a list
-        curl -X POST \
-          https://api.openrouteservice.org/pois?api_key=INSERT_YOUR_KEY \
-          -H 'content-type: application/json' \
-          -d '{
-            "request": "list"
-        }'
+          # POST LineString as polyline
+          curl -XPOST https://api.openrouteservice.org/elevation/line?api_key=INSERT_YOUR_KEY \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "format_in": "polyline",
+              "format_out": "encodedpolyline",
+              "geometry": [[13.349762, 38.11295],
+                           [12.638397, 37.645772]]
+                }'
         ```
       parameters:
         - name: "api_key"
@@ -127,345 +77,229 @@ paths:
           required: true
           default: "your-api-key"
         - in: body
-          name: "body"
-          required: true
-          description: body for a post request
+          name: body
+          description: Query the elevation of a line in various formats.
           schema:
-            $ref: '#/definitions/LocationsBodyPois'
-            # this does not work yet..
-            # https://swagger.io/docs/specification/describing-request-body/
-            # oneOf:
-            #- $ref: '#/definitions/LocationsBodyPois'
-            #- $ref: '#/definitions/LocationsBodyStats'
-            #- $ref: '#/definitions/LocationsBodyList'
+            $ref: '#/definitions/LineGeometryPost'
       responses:
         200:
-          description: "Standard response for successfully processed requests."
-          schema:
-            $ref: '#/definitions/LocationsPoiResponse'
-            # oneOf:
-            #- $ref: '#/definitions/LocationsPoiResponse'
-            #- $ref: '#/definitions/LocationsStatsResponse'
-            #- $ref: '#/definitions/LocationsListResponse'
+          $ref: "#/responses/success"
         401:
-          description: "Authorization field missing."
+          $ref: "#/responses/authmissing"
         403:
-          description: "Key not authorised."
+          $ref: "#/responses/notauthorized"
         500:
+          $ref: "#/responses/serverissue"
+  "/elevation/point":
+    post:
+      summary:  Enrich a point with elevation.
+      description: |
+        This endpoint can take a 2D point and enrich it with elevation from a variety of datasets.
+
+        The input and output formats are:
+          * GeoJSON
+          * Point
+
+        Examples:
+        ```
+          # POST point as GeoJSON
+          curl -XPOST https://api.openrouteservice.org/elevation/point?api_key=INSERT_YOUR_KEY \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "format_in": "geojson",
+              "format_out": "geojson",
+              "geometry": {
+                "coordinates": [13.349762, 38.11295],
+                "type": "Point"
+              }
+            }'
+        ```
+      parameters:
+        - name: "api_key"
+          in: "query"
           description: |
-            An unexpected error was encountered and more detailed internal
-            errorcode is provided.
-            | Internal Code | Description                                        |
-            |:-------------:|----------------------------------------------------|
-            | 4000 |  Invalid JSON object in request |
-            | 4001 |  Category or category group ids missing |
-            | 4002 |  Geometry is missing |
-            | 4003 |  Bounding box and or geojson not present in request |
-            | 4004 |  Buffer is missing |
-            | 4005 |  Geometry length does not meet the restrictions |
-            | 4006 |  Unsupported HTTP method |
-            | 4007 |  GeoJSON parsing error |
-            | 4008 |  Geometry size does not meet the restrictions |
-            | 4099 |  Unknown internal error |
-securityDefinitions:
-  UserSecurity:
-    name: "api_key"
-    description: |
-      Add your API Key as the value of the api_key parameter to your request.
-    type: "apiKey"
-    in: "query"
+            Insert your API Key here.
+          type: "string"
+          required: true
+          default: "your-api-key"
+        - in: body
+          name: body
+          description: Query the elevation of a point in various formats.
+          schema:
+            $ref: '#/definitions/PointGeometryPost'
+      responses:
+        200:
+          $ref: "#/responses/success"
+        401:
+          $ref: "#/responses/authmissing"
+        403:
+          $ref: "#/responses/notauthorized"
+        500:
+          $ref: "#/responses/serverissue"
+    get:
+      summary: Enrich a point with elevation.
+      description: |
+        This endpoint can take a 2D point and enrich it with elevation from a variety of datasets.
+
+        The output formats are:
+          * GeoJSON
+          * Point
+
+        Example:
+        ```
+          # GET point
+          curl -XGET https://localhost:5000/elevation/point?geometry=13.349762,38.11295
+        ```
+      parameters:
+        - name: "api_key"
+          in: "query"
+          description: |
+            Insert your API Key here.
+          type: "string"
+          required: true
+          default: "your-api-key"
+        - in: query
+          name: geometry
+          description: The point to be queried, in comma-separated lon,lat values, e.g. [13.349762, 38.11295]
+          required: true
+          type: array
+          items:
+            type: double
+          example:
+            - 13.349762
+            - 38.11295
+        - in: query
+          name: format_out
+          description: The output format to be returned.
+          enum: [geojson, point]
+          example: point
+          default: geojson
+        - in: query
+          name: dataset
+          description: The elevation dataset to be used.
+          type: string
+          enum: [srtm]
+          example: srtm
+          default: srtm
+      responses:
+        200:
+          $ref: "#/responses/success"
+        401:
+          $ref: "#/responses/authmissing"
+        403:
+          $ref: "#/responses/notauthorized"
+        500:
+          $ref: "#/responses/serverissue"
 definitions:
-  LocationsBodyPois:
-    example: {
-      "request": "pois",
+  LineGeometryPost:
+    type: object
+    required:
+      - format_in
+      - geometry
+    properties:
+      format_in:
+        type: string
+        description: The input format the API has to expect.
+        enum: [geojson, polyline, encodedpolyline]
+        example: encodedpolyline
+      format_out:
+        type: string
+        description: The output format to be returned.
+        enum: [geojson, polyline, encodedpolyline]
+        example: encodedpolyline
+        default: geojson
+      dataset:
+        type: string
+        description: The elevation dataset to be used.
+        enum: [srtm]
+        example: srtm
+        default: srtm
+      geometry:
+        type: object
+        description: |
+          * geojson: A geometry object of a LineString GeoJSON, e.g.
+                   {"type": "LineString",
+                    "coordinates": [[13.331302, 38.108433],[13.331273, 38.10849]]
+                   }
+          * polyline: A list of coordinate lists, e.g.
+                   [[13.331302, 38.108433], [13.331273, 38.10849]]
+
+          * encodedpolyline: A <a href="https://developers.google.com/maps/documentation/utilities/polylinealgorithm">Google encoded polyline</a>, e.g.
+                   u`rgFswjpAKD
+    example:
+       {"format_in": "geojson",
+        "format_out": "geojson",
+        "dataset": "srtm",
+        "geometry": {
+                     "type": "LineString",
+                     "coordinates": [
+                        [13.331302, 38.108433],
+                        [13.331273, 38.10849]
+                     ]
+                    }
+        }
+
+  PointGeometryPost:
+    type: object
+    required:
+      - format_in
+      - geometry
+    example:
+      {"format_in": "geojson",
+      "format_out": "geojson",
+      "dataset": "srtm",
       "geometry": {
-        "bbox": [
-          [8.458614349365236, 55.470054514892844],
-          [8.473613262176515, 55.47323501110393]
-        ],
-        "geojson": {
-          "type": "Point",
-          "coordinates": [8.458614349365236, 55.470054514892844]
-        },
-        "buffer": 100
-      },
-      "limit": 200
-    }
-    type: object
-    required:
-      - request
-      - geometry
+               "type": "Point",
+               "coordinates": [13.331302, 38.108433]
+              }
+      }
     properties:
-      request:
+      format_in:
         type: string
-        example: pois
+        description: The input format the API has to expect.
+        enum: [geojson, point]
+        example: point
+      format_out:
+        type: string
+        description: The output format to be returned.
+        enum: [geojson, point]
+        example: point
+        default: geojson
+      dataset:
+        type: string
+        description: The elevation dataset to be used.
+        enum: [srtm]
+        example: srtm
+        default: srtm
+      geometry:
+        type: object
+        description: |
+          * geojson: A geometry object of a Point GeoJSON, e.g.
+                   {"type": "Point",
+                    "coordinates": [13.331273, 38.10849]
+                   }
+          * point: A coordinate list, e.g.
+                   [13.331273, 38.10849]
+
+  GeoJSONResponse:
+    type: object
+    properties:
+      attribution:
+        type: string
+      version:
+        type: string
+      timestamp:
+        type: integer
       geometry:
         type: object
         properties:
-          buffer:
-            $ref: "#/definitions/buffer"
-          bbox:
-            $ref: "#/definitions/bbox"
-          geojson:
-            $ref: "#/definitions/geojson"
-      filters:
-        type: object
-        properties:
-          category_group_ids:
-            $ref: "#/definitions/category_group_ids"
-          category_ids:
-            $ref: "#/definitions/category_ids"
-          # CUSTOM FILTERS
-          name:
-            $ref: "#/definitions/name"
-          wheelchair:
-            $ref: "#/definitions/wheelchair"
-          smoking:
-            $ref: "#/definitions/smoking"
-          fee:
-            $ref: "#/definitions/fee"
-      limit:
-        $ref: "#/definitions/limit"
-      sortby:
-        $ref: "#/definitions/sortby"
-    title:  "Openpoiservice poi request"
-
-  LocationsBodyStats:
-    required:
-      - request
-      - geometry
-    properties:
-      request:
-        type: string
-        example: stats
-      geometry:
-        type: object
-        properties:
-          buffer:
-            $ref: "#/definitions/buffer"
-          bbox:
-            $ref: "#/definitions/bbox"
-          geojson:
-            $ref: "#/definitions/geojson"
-      filters:
-        type: object
-        properties:
-          category_group_ids:
-            $ref: "#/definitions/category_group_ids"
-          category_ids:
-            $ref: "#/definitions/category_ids"
-          # CUSTOM FILTERS NOT SUPPORTED YET!
-          #name:
-          #  $ref: "#/definitions/name"
-          #wheelchair:
-          #  $ref: "#/definitions/wheelchair"
-          #smoking:
-          #  $ref: "#/definitions/smoking"
-          #fee:
-          #  $ref: "#/definitions/fee"
-    title:  "Openpoiservice category statistics"
-
-  LocationsBodyList:
-    required:
-      - request
-    properties:
-      request:
-        type: string
-        example: list
-    title: "Openpoiservice category list"
-
-  # SHARED PROPERTIES
-  category_group_ids:
-    type: array
-    items:
-      type: integer
-      format: int64
-    example: [420]
-  category_ids:
-    type: array
-    items:
-      type: integer
-      format: int64
-    example: [601, 280]
-  limit:
-    type: integer
-    format: int64
-    example: 1000
-  buffer:
-    type: integer
-    format: int64
-    example: 500
-  sortby:
-    type: string
-    example: category
-    enum:
-    - category
-    - distance
-  bbox:
-    type: array
-    #items:
-    #  type: array
-    #  minItems: 2
-    #  maxItems: 2
-    #  items:
-    #    type: float
-    minItems: 2
-    maxItems: 2
-    example: [[53.075051,8.798952],[53.080785,8.907160]]
-    description: The pattern for this bbox string is minlon,minlat,maxlon,maxlat
-
-  geojson:
-    description: This is a GeoJSON object. Is either Point, Polygon or LineString.
-    type: object
-  # SHARED CUSTOM PROPERTIES
-  name:
-    description: Filter by name of the poi object.
-    type: array
-    example: ["Tankstelle",...]
-  wheelchair:
-    description: Filter example.
-    type: array
-    example: ["yes", "no", "limited", "designated"]
-  smoking:
-    description: Filter example.
-    type: array
-    example: ["dedicated","yes","no","separated","isolated","outside"]
-  fee:
-    description: Filter example.
-    type: array
-    example: ["yes", "no"]
-
-  # List response object
-  LocationsListResponse:
-    type: object
-    title: "Openpoiservice category list response"
-    description: "Openpoiservice category list"
-
-  # Poi response object
-  LocationsPoiResponse:
-    type: "object"
-    properties:
-      type:
-        type: "string"
-        default: "FeatureCollection"
-      features:
-        type: "array"
-        items:
-          $ref: "#/definitions/location_features"
-    title: "Openpoiservice poi response"
-
-  # Stats response object
-  LocationsStatsResponse:
-    type: "object"
-    properties:
-      places:
-        type: "object"
-        $ref: "#/definitions/places_object"
-
-    title: "Openpoiservice stats response"
-
-  places_object:
-    type: object
-    properties:
-      category_group_id:
-        type: object
-        $ref: "#/definitions/stats_object"
-      total_count:
-        type: integer
-    additionalProperties:
-      type: object
-      $ref: "#/definitions/stats_object"
-    title: "Places object"
-
-  stats_object:
-    type: object
-    properties:
-      categories:
-        type: object
-        $ref: "#/definitions/category_object"
-      name:
-        type: string
-        description: name of group
-      total_count:
-        type: integer
-    title: "Stats object"
-
-  category_object:
-    type: object
-    properties:
-      category_id:
-        type: integer
-    additionalProperties:
-      type: object
-
-  location_features:
-    type: "object"
-    properties:
-      type:
-        type: "string"
-        default: "Feature"
-      geometry:
-        type: "object"
-        $ref: "#/definitions/location_features_geometry"
-      feature_properties:
-        type: "object"
-        $ref: "#/definitions/location_features_properties"
-    title: "GeoJSON features object"
-
-  location_features_geometry:
-    properties:
-      type:
-        type: "string"
-        default: "Point"
-      coordinates:
-        type: "array"
-        items:
-          type: "number"
-          format: "double"
-        maxItems: 2
-        minItems: 2
-    title: "GeoJSON geometry object"
-
-  location_features_properties:
-    title: "GeoJSON properties object"
-    properties:
-      osm_id:
-        type: "number"
-      osm_type:
-        type: "number"
-      distance:
-        type: "number"
-      category_ids:
-        type: "object"
-        $ref: "#/definitions/location_features_properties_category_ids"
-      osm_tags:
-        type: "object"
-        $ref: "#/definitions/location_features_properties_osm_tags"
-
-  location_features_properties_category_ids:
-    properties:
-      category_id:
-        type: "object"
-        properties:
-          category_name:
-            type: "string"
-          category_group:
-            type: "number"
-
-  location_features_properties_osm_tags:
-    type: "object"
-    properties:
-      name:
-        type: "string"
-      address:
-        type: "string"
-      website:
-        type: "string"
-      opening_hours:
-        type: "string"
-      wheelchair:
-        type: "string"
-      distance:
-        type: "string"
-      fee:
-        type: "string"
+          type:
+            type: string
+          coordinates:
+            type: array
+            items:
+              type: array
+              maxItems: 2
+              minItems: 2
+              items:
+                type: float
