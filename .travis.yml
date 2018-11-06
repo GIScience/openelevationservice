@@ -10,10 +10,10 @@ addons:
   postgresql: "10"
   apt:
     packages:
-    - postgresql-10
-    - postgresql-client-10
+    - postgresql-9.6
+    - postgresql-client-9.6
     - postgis
-    - postgresql-10-postgis-scripts
+    - postgresql-9.6-postgis-2.4-scripts
 
 before_install:
   - /bin/bash -c "DEBIAN_FRONTEND=noninteractive sudo apt-get install -y tzdata"
@@ -24,9 +24,9 @@ env:
   global:
     # Flask env variables
     - TESTING=true
-    - FLASK_APP=manage
-    - OES_LOGLEVEL=DEBUG
-    - APP_SETTINGS=openelevationservice.server.config.TestingConfig
+    - FLASK_APP="$TRAVIS_BUILD_DIR/manage"
+    - OES_LOGLEVEL="DEBUG"
+    - APP_SETTINGS="openelevationservice.server.config.TestingConfig"
     # PG env variables
     - PGPORT=5433
 
