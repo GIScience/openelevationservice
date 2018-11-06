@@ -30,7 +30,8 @@ def downloadsrtm(xy_range):
     
     # Create session for authentication
     session = requests.Session()
-    session.auth = tuple(SETTINGS['srtm_parameters'].values())
+    if not environ.get('SRTMPASS') and not environ.get('SRTMUSER'):
+        session.auth = tuple(SETTINGS['srtm_parameters'].values())
     response = session.get(base_url)
     
     soup = BeautifulSoup(response.content, features="html.parser")
