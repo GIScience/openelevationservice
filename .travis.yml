@@ -12,7 +12,8 @@ addons:
     packages:
     - postgresql-10
     - postgresql-client-10
-    - postgis*
+    - postgis
+    - postgresql-10-postgis-scripts
 
 before_install:
   - /bin/bash -c "DEBIAN_FRONTEND=noninteractive sudo apt-get install -y tzdata"
