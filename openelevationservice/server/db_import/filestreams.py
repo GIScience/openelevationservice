@@ -3,8 +3,7 @@
 from openelevationservice import TILES_DIR, SETTINGS
 from openelevationservice.server.utils.logger import get_logger
 
-from os import path, environ, getcwd
-import glob
+from os import path, environ
 import requests
 import subprocess
 import zipfile
@@ -67,6 +66,8 @@ def raster2pgsql():
         http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp
         in 'minx, maxx, miny, maxy.
     :type xy_range: comma-separated range string
+    
+    :raises subprocess.CalledProcessError: Raised when raster2pgsql throws an error.
     """
     
     pg_settings = SETTINGS['provider_parameters']

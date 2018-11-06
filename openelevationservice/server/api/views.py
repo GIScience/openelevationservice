@@ -18,6 +18,8 @@ main_blueprint = Blueprint('main', __name__, )
 def elevationline():
     """
     Function called when user posts to /elevation/line.
+    
+    :raises InvalidUsage: internal HTTP 500 error with more detailed description.
 
     :returns: elevation response 
     :rtype: Response
@@ -65,6 +67,8 @@ def elevationline():
 def elevationpoint():
     """
     Function called when user posts to/gets /elevation/point.
+    
+    :raises InvalidUsage: internal HTTP 500 error with more detailed description.
 
     :returns: elevation response 
     :rtype: Response class

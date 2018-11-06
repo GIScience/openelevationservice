@@ -4,6 +4,8 @@ from openelevationservice import __version__, SETTINGS
 import time
 
 class ResponseBuilder():
+    """Builds the basis for a query response."""
+    
     def __init__(self):
         """
         Initializises the query builder.

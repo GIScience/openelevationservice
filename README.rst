@@ -146,17 +146,17 @@ The openelevationservice exposes 2 endpoints:
 +-----------------------+-------------------+------------+---------+--------------------------------------+
 |       Endpoint        | Method(s) allowed | Parameter  | Default | Values                               |
 +=======================+===================+============+=========+======================================+
-| ``/elevation/line``   | POST              | format_in  | geojson | geojson, linestring, encodedpolyline |
+| ``/elevation/line``   | POST              | format_in  |    -    | geojson, linestring, encodedpolyline |
 |                       |                   +------------+---------+--------------------------------------+
-|                       |                   | geometry   | none    | depends on `format_in`               |
+|                       |                   | geometry   |    -    | depends on ``format_in``             |
 |                       |                   +------------+---------+--------------------------------------+
 |                       |                   | format_out | geojson | geojson, linestring, encodedpolyline |
 |                       |                   +------------+---------+--------------------------------------+
 |                       |                   | dataset    | srtm    | srtm (so far)                        |
 +-----------------------+-------------------+------------+---------+--------------------------------------+
-| ``/elevation/point``  | GET, POST         | format_in  | geojson | geojson, point                       |
+| ``/elevation/point``  | GET, POST         | format_in  |    -    | geojson, point                       |
 |                       |                   +------------+---------+--------------------------------------+
-|                       |                   | geometry   | none    | depends on ``format_in``             |
+|                       |                   | geometry   |    -    | depends on ``format_in``             |
 |                       |                   +------------+---------+--------------------------------------+
 |                       |                   | format_out | geojson | geojson, point                       |
 |                       |                   +------------+---------+--------------------------------------+

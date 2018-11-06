@@ -13,6 +13,8 @@ log = logger.get_logger(__name__)
 table_name = SETTINGS['provider_parameters']['table_name']
 
 class Cgiar(db.Model):
+    """Database model for SRTM v4.1 aka CGIAR dataset."""
+    
     __tablename__ = table_name
     
     rid = db.Column(db.Integer, primary_key=True)

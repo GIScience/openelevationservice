@@ -4,6 +4,7 @@ from openelevationservice.server.api import error_codes
 
 
 class InvalidUsage(Exception):
+    """Provides more detailed description of internal 500 error."""
 
     def __init__(self, status_code=500, error_code=None, message=None):
         """
@@ -34,5 +35,7 @@ class InvalidUsage(Exception):
             }
 
     def to_dict(self):
+        """converts error to dict"""
+        
         rv = dict(self.error or ())
         return rv

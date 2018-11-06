@@ -9,3 +9,12 @@ test.py
 *.tif
 *.hdr
 *.tfw
+
+# Docs
+docs/build
+
+# PyPI
+dist/
+*egg-info/
+*.in
+build/

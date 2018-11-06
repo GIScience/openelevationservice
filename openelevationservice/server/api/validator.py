@@ -24,12 +24,15 @@ schema_get = {'geometry': {'type': 'list', 'schema': {'type': 'string'}, 'requir
 
 def validate_request(request):
     """
-    Validates full request according to schemas and application/json in header
+    Validates full request with regards to validation schemas and HTTP headers.
     
     :param request: POST or GET request from user
     :type request: Flask request
     
+    :raises InvalidUsage: internal HTTP 500 error with more detailed description.
+    
     :returns: validated and normalized request arguments
+    :rtype: dict
     """        
     if request.method == 'GET':
         v.allow_unknown = True

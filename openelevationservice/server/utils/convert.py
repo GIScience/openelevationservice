@@ -14,6 +14,8 @@ def geojson_to_geometry(geometry_str):
     :param geometry_str: GeoJSON representation to be converted
     :type geometry_str: str
     
+    :raises InvalidUsage: internal HTTP 500 error with more detailed description.
+    
     :returns: Shapely geometry
     :rtype: Shapely geometry
     """
@@ -34,6 +36,8 @@ def point_to_geometry(point):
     :param point: coordinates of a point
     :type point: list/tuple
     
+    :raises InvalidUsage: internal HTTP 500 error with more detailed description.
+    
     :returns: Point
     :rtype: shapely.geometry.Point
     """
@@ -52,6 +56,8 @@ def polyline_to_geometry(point_list):
     
     :param point_list: Coordinates of line to be converted.
     :type point_list: list/tuple of lists/tuples
+    
+    :raises InvalidUsage: internal HTTP 500 error with more detailed description.
     
     :returns: LineString
     :rtype: shapely.geometry.LineString
@@ -74,6 +80,9 @@ def decode_polyline(polyline, is3D):
         
     :param polyline: An encoded polyline, only the geometry.
     :type polyline: string
+    
+    :param is3D: switch for polylines with elevation data
+    :type id3D: boolean
     
     :returns: LineString in 2D or 3D
     :rtype: shapely.geometry.LineString

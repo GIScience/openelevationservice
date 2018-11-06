@@ -43,6 +43,8 @@ def line_elevation(geometry, format_out, dataset):
     :param dataset: Elevation dataset to use for querying
     :type dataset: string
     
+    :raises InvalidUsage: internal HTTP 500 error with more detailed description. 
+        
     :returns: 3D line as GeoJSON or WKT
     :rtype: string
     """
@@ -98,6 +100,8 @@ def point_elevation(geometry, format_out, dataset):
     
     :param dataset: Elevation dataset to use for querying
     :type dataset: string
+    
+    :raises InvalidUsage: internal HTTP 500 error with more detailed description.
     
     :returns: 3D Point as GeoJSON or WKT
     :rtype: string
