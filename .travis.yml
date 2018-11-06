@@ -28,6 +28,7 @@ env:
     - APP_SETTINGS=openelevationservice.server.config.TestingConfig
     # PG env variables
     - PGPASSWORD=gis
+    - PGPORT=5433
  
 # database creation
 before_script:
