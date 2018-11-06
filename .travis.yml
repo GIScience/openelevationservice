@@ -28,7 +28,7 @@ env:
     - OES_LOGLEVEL="DEBUG"
     - APP_SETTINGS="openelevationservice.server.config.TestingConfig"
     # PG env variables
-    - PGPORT=5433
+#    - PGPORT=5433
 
 # database creation
 before_script:
