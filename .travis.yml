@@ -12,7 +12,7 @@ addons:
     packages:
     - postgresql-10
     - postgresql-client-10
-    - postgresql-10-postgis-2.4
+    - postgresql-10-postgis-2.5
 
 before_install:
   - /bin/bash -c "DEBIAN_FRONTEND=noninteractive sudo apt-get install -y tzdata"
@@ -31,10 +31,10 @@ env:
 
 # database creation
 before_script:
-  - sudo -u postgres psql -c "CREATE USER gis WITH PASSWORD 'gis';"
-  - sudo -u postgres psql -c "ALTER USER gis WITH SUPERUSER;"
-  - sudo -u postgres psql -c "CREATE DATABASE gis;"
-  - sudo -u postgres psql -c "CREATE EXTENSION postgis;" -d gis
+  - sudo -u postgres /usr/lib/postgresql/10/bin/psql -c "CREATE USER gis WITH PASSWORD 'gis';"
+  - sudo -u postgres /usr/lib/postgresql/10/bin/psql -c "ALTER USER gis WITH SUPERUSER;"
+  - sudo -u postgres /usr/lib/postgresql/10/bin/psql -c "CREATE DATABASE gis;"
+  - sudo -u postgres /usr/lib/postgresql/10/bin/psql -c "CREATE EXTENSION postgis;" -d gis
   - mv openelevationservice/server/ops_settings.sample.yml openelevationservice/server/ops_settings.yml
 
 install: pip install -r requirements.txt
