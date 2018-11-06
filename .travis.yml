@@ -2,14 +2,19 @@ language: python
 
 python:
   - "3.6"
-
+  
 services:
   - postgresql
 
+addons:
+  postgresql: "9.6"
+  apt:
+    packages:
+    - postgresql-9.6
+    - postgresql-client-9.6
+    - postgresql-9.6-postgis*
+
 before_install:
-  - sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable -y
-  - sudo apt-get update -q
-  - sudo apt-get install -y postgis
   - /bin/bash -c "DEBIAN_FRONTEND=noninteractive sudo apt-get install -y tzdata"
   - sudo ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime
   - sudo dpkg-reconfigure --frontend noninteractive tzdata
@@ -24,7 +29,6 @@ env:
     # CGIAR credentials, encrypted
     - SRTMUSER=GfAv9pnb9FRodSO4FMnQS8o7fQ9nLUl56m50EkrOHumxxMDMQfmquT98cuaeiRLVq9XmQhz4P2U1kHqKBUuAHTF1s+/V6RC3KQ6WxOS3xlmpAg4NMQF7MwTLanUtXOVkIozaeuDZiXQqjo+wTC92FYvGA17KBmTK1yfsEn6HGcfHw5ax2gJ+kmFnSNwN0VzrGOzw0zOVSaM8pAObuEYr1mgqNfo0wnX9O7SCifSILJGxTx1FwZqQWGsxeIBjkQkNlhLmChCd1Qm0k+ioiZOuIOeEst0+owZ/Wla4pJellObJjCxZ1sMAvgaFvOaXgR8iscw8zsUbRO2cePuaRoHFLqOKBTSokS7KibY2LDTuI7m5aVblPWp49MjhjiHaok53VN0IXfW5yHZQW7LtHyMHopTVT7L5zn2RKZNfnREYlkKZcYb04WXxUVAl3LwRAkDe1vxrkb+GzqgY4n438joFEPUUT+oR3c+xMIP+eZXEGO0HnOmpkd29UFT/ZizXt02MfSRHgmieL3POi0Wif+0jGDlxfTcvom4gikv3vyldanVlO/PySop+R0mFczUD5IMZIacEu/smkp/9XNO3gmBJ0T0LX1+4BwShbw75HERiVArlY4f6kbnshx065ayCzFqvUd0fYtT7VniIgyL2otZdcEu+NL3G/MmNQ+mGhFZBZs8=
     - SRTMPASS=f4/sARD0iEUG8e5W3/D7ILk14Vf2w8OOJoPFDpOGiRBWdkCxf22mMjrErYWfLitW/rdhNUVXF3G2DP0WgxM6aTvNUR9aA4YoUrwbHy0ZF/vL70duayOH+wvHY1tDSvWJS3zfruaS4vXh27Eky1LZ1P1e5ke7t13TXmbyH6JqofYzIGAsttX2X2Kl0bBmO7LMlbKf8A7WjysSus+IkoDFMaGneUozDJvscmtD7XMuzjMcd5RxMHRiHNsWtlb+OjXVolSuJmF6T0ubD8un5X6kYD1IjWPUY8GLpegCe9zo2eAbZAYhocx0Sz0zDMcwSn1wtzSN83KYjLoRZjuKCBE36mxpRCHNmTzFsco6+MAjRMCZmNABRrufstfA6N/4mbpc6UJu2kAYyjUiufVt04sPInCYU7oR953whM1P1EfAFG2HqKJ5NWqiUOUBxxUr0IG2VACqmdUFzerKyYRhsASfwMXT+ghw9gxxso5SPFDt6v6vjqeA1sRX5rNSsZiWoT2GZEet38fIG603N9L/9b/q9PpbTZTAWB5HD8P3BUBimdCbApXPwATuqln+KXDr6CC0t0Q1t8r4Gab9RFfQ6xrqzgyd86YW/TcN8V0R8wXt9/jtb3W4KQYWMRyQm+y5Pp7qNc23MhXK9MxX9iqL1mhHGA2PoQTVjT5597S/qVVuptY=
-    - PGPORT=5433
 
 # database creation
 before_script:
