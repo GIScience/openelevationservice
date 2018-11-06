@@ -27,8 +27,6 @@ env:
     - FLASK_APP="$TRAVIS_BUILD_DIR/manage"
     - OES_LOGLEVEL="DEBUG"
     - APP_SETTINGS="openelevationservice.server.config.TestingConfig"
-    # PG env variables
-    - PGPORT=5433
 
 # database creation
 before_script:
