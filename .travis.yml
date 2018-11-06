@@ -27,13 +27,14 @@ env:
     - OES_LOGLEVEL=DEBUG
     - APP_SETTINGS=openelevationservice.server.config.TestingConfig
     # PG env variables
-    - PGPASSWORD=gis
+#    - PGPASSWORD=gis
     - PGPORT=5433
  
 # database creation
 before_script:
   - psql -c "CREATE USER gis WITH PASSWORD 'gis';" -U postgres
   - psql -c "ALTER USER gis WITH SUPERUSER; -U postgres
+  - export PGPASSWORD=gis
   - psql -c "CREATE DATABASE gis;" -U gis
   - psql -c 'CREATE EXTENSION postgis;' -U gis -d gis
   - mv openelevationservice/server/ops_settings.sample.yml openelevationservice/server/ops_settings.yml
