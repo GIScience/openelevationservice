@@ -2,7 +2,40 @@ language: python
 
 python:
   - "3.6"
-  - "3.7"
+
+services:
+  - postgresql
+
+addons:
+  postgresql: "10"
+  apt:
+    packages:
+    - postgresql-10
+    - postgresql-client-10
+    - postgis
+    
+before_install:
+  - /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata"
+  - ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+  - dpkg-reconfigure --frontend noninteractive tzdata
+    
+env:
+  global:
+    # Flask env variables
+    - TESTING=true
+    - FLASK_APP=manage
+    - OES_LOGLEVEL=DEBUG
+    - APP_SETTINGS=openelevationservice.server.config.TestingConfig
+    # PG env variables
+    - PGPASSWORD=gis
+ 
+# database creation
+before_script:
+  - psql -c "CREATE USER gis WITH PASSWORD 'gis';" -U postgres
+  - psql -c "ALTER USER gis WITH SUPERUSER; -U postgres
+  - psql -c "CREATE DATABASE gis;" -U gis
+  - psql -c 'CREATE EXTENSION postgis;' -U gis -d gis
+  - mv openelevationservice/server/ops_settings.sample.yml openelevationservice/server/ops_settings.yml
 
 install: pip install -r requirements.txt
 
