@@ -32,6 +32,8 @@ env:
  
 # database creation
 before_script:
+  - echo $PGPASSWORD
+  - psql --version
   - psql -c "CREATE USER gis WITH PASSWORD 'gis';" -U postgres
   - psql -c "ALTER USER gis WITH SUPERUSER; -U postgres
   - export PGPASSWORD=gis
