@@ -34,7 +34,7 @@ before_script:
   - sudo -u postgres psql -c "CREATE USER gis WITH PASSWORD 'gis';"
   - sudo -u postgres psql -c "ALTER USER gis WITH SUPERUSER;"
   - sudo -u postgres psql -c "CREATE DATABASE gis OWNER gis;"
-  - sudo -u postgres psql "CREATE EXTENSION postgis;"
+  - sudo -u postgres psql -c "CREATE EXTENSION postgis;"
   - mv openelevationservice/server/ops_settings.sample.yml openelevationservice/server/ops_settings.yml
 
 install: pip install -r requirements.txt
