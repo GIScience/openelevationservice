@@ -27,7 +27,7 @@ env:
     - OES_LOGLEVEL=DEBUG
     - APP_SETTINGS=openelevationservice.server.config.TestingConfig
     # PG env variables
-#    - PGPASSWORD=gis
+    - PGPASSWORD=postgres
     - PGPORT=5433
  
 # database creation
