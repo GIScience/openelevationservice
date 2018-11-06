@@ -12,7 +12,7 @@ addons:
     packages:
     - postgresql-9.6
     - postgresql-client-9.6
-    - postgis
+    - postgresql-9.6-postgis-2.4
     - postgresql-9.6-postgis-2.4-scripts
 
 before_install:
@@ -27,8 +27,6 @@ env:
     - FLASK_APP="$TRAVIS_BUILD_DIR/manage"
     - OES_LOGLEVEL="DEBUG"
     - APP_SETTINGS="openelevationservice.server.config.TestingConfig"
-    # PG env variables
-#    - PGPORT=5433
 
 # database creation
 before_script:
