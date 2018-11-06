@@ -32,10 +32,10 @@ env:
 
 # database creation
 before_script:
-  - sudo -u postgres /usr/lib/postgresql/10/bin/psql -c "CREATE USER gis WITH PASSWORD 'gis';"
-  - sudo -u postgres /usr/lib/postgresql/10/bin/psql -c "ALTER USER gis WITH SUPERUSER;"
-  - sudo -u postgres /usr/lib/postgresql/10/bin/psql -c "CREATE DATABASE gis;"
-  - sudo -u postgres /usr/lib/postgresql/10/bin/psql -c "CREATE EXTENSION postgis;" -d gis
+  - sudo -u postgres psql -c "CREATE USER gis WITH PASSWORD 'gis';"
+  - sudo -u postgres psql -c "ALTER USER gis WITH SUPERUSER;"
+  - sudo -u postgres psql -c "CREATE DATABASE gis;"
+  - sudo -u postgres psql -c "CREATE EXTENSION postgis;" -d gis
   - mv openelevationservice/server/ops_settings.sample.yml openelevationservice/server/ops_settings.yml
 
 install: pip install -r requirements.txt
