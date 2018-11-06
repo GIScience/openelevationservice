@@ -34,9 +34,12 @@ def downloadsrtm(xy_range):
     user = environ.get('SRTMPASS')
     pw = environ.get('SRTMUSER')
     if not user and not pw:
-        session.auth = tuple(SETTINGS['srtm_parameters'].values())
+        auth = tuple(SETTINGS['srtm_parameters'].values())
     else:
-        session.auth = tuple([user,pw])
+        auth = tuple([user,pw])
+    session.auth = auth
+    
+    log.debug("SRTM credentials: {}".format(session.auth))
     
     response = session.get(base_url)
     
