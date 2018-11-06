@@ -31,6 +31,6 @@ class DevelopmentConfig(BaseConfig):
 class TestingConfig(BaseConfig):
     """Testing configuration."""
     
-    SQLALCHEMY_DATABASE_URI = 'postgresql://{user_name}:{password}@{host}:{port}/{db_name}'.format(**SETTINGS['provider_parameters'])
+    SQLALCHEMY_DATABASE_URI = 'postgresql://{user_name}:{password}@{host}:{port_test}/{db_name}'.format(**SETTINGS['provider_parameters'])
     DEBUG_TB_ENABLED = False
     PRESERVE_CONTEXT_ON_EXCEPTION = False

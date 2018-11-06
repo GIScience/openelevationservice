@@ -13,12 +13,12 @@ addons:
     - postgresql-10
     - postgresql-client-10
     - postgis
-    
+
 before_install:
   - /bin/bash -c "DEBIAN_FRONTEND=noninteractive sudo apt-get install -y tzdata"
   - sudo ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime
   - sudo dpkg-reconfigure --frontend noninteractive tzdata
-    
+
 env:
   global:
     # Flask env variables
@@ -27,18 +27,14 @@ env:
     - OES_LOGLEVEL=DEBUG
     - APP_SETTINGS=openelevationservice.server.config.TestingConfig
     # PG env variables
-    - PGPASSWORD=postgres
     - PGPORT=5433
- 
+
 # database creation
 before_script:
-  - echo $PGPASSWORD
-  - psql --version
-  - psql -c "CREATE USER gis WITH PASSWORD 'gis';" -U postgres
-  - psql -c "ALTER USER gis WITH SUPERUSER; -U postgres
-  - export PGPASSWORD=gis
-  - psql -c "CREATE DATABASE gis;" -U gis
-  - psql -c 'CREATE EXTENSION postgis;' -U gis -d gis
+  - sudo -u postgres psql -c "CREATE USER gis WITH PASSWORD 'gis';"
+  - sudo -u postgres psql -c "ALTER USER gis WITH SUPERUSER;"
+  - sudo -u postgres psql -c "CREATE DATABASE gis OWNER gis;"
+  - sudo -u postgres psql "CREATE EXTENSION postgis;"
   - mv openelevationservice/server/ops_settings.sample.yml openelevationservice/server/ops_settings.yml
 
 install: pip install -r requirements.txt

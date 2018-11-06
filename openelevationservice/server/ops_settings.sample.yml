@@ -12,3 +12,4 @@ provider_parameters:
   password: gis
   host: localhost
   port: 5432
+  port_test: 5433
