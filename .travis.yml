@@ -15,9 +15,9 @@ addons:
     - postgis
     
 before_install:
-  - /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata"
-  - ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime
-  - dpkg-reconfigure --frontend noninteractive tzdata
+  - /bin/bash -c "DEBIAN_FRONTEND=noninteractive sudo apt-get install -y tzdata"
+  - sudo ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+  - sudo dpkg-reconfigure --frontend noninteractive tzdata
     
 env:
   global:
