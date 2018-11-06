@@ -12,7 +12,7 @@ addons:
     packages:
     - postgresql-9.6
     - postgresql-client-9.6
-    - postgis
+    - postgresql-9.6-postgis-2.4
     - postgresql-9.6-postgis-2.4-scripts
 
 before_install:
