@@ -119,4 +119,3 @@ class LineTest(BaseTestCase):
         
         self.assertRaises(api_exceptions.InvalidUsage)
         self.assertEqual(response.get_json()['code'], 4002)
-        self.assertIn(b'At least one vertex is outside the bounds', response.data)

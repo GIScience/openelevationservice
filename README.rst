@@ -1,9 +1,9 @@
 .. image:: https://travis-ci.org/GIScience/openelevationservice.svg?branch=master
-    :target: https://travis-ci.com/GIScience/openrouteservice-py
+    :target: https://travis-ci.com/GIScience/openelevationservice
     :alt: Build status
 
-.. image:: https://openelevationservice.readthedocs.io/en/latest/?badge=latest
-   :target: http://openrouteservice-py.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/openelevationservice/badge/?version=latest
+   :target: https://readthedocs.org/projects/openelevationservice
    :alt: Documentation Status
 
 Quickstart
