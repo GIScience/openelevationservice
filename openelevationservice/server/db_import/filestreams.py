@@ -108,9 +108,9 @@ def raster2pgsql():
                          env=env_current
                          )
     
-    for line in proc.stdout:
-        log.debug(line.decode())
-    proc.stdout.close()
+#    for line in proc.stdout:
+#        log.debug(line.decode())
+#    proc.stdout.close()
     return_code = proc.wait()
     if return_code:
         raise subprocess.CalledProcessError(return_code, cmd_raster2pgsql)

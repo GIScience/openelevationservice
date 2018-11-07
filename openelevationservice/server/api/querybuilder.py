@@ -71,20 +71,27 @@ def line_elevation(geometry, format_out, dataset):
             # Return GeoJSON directly in PostGIS
             query_final = db.session \
                               .query(func.ST_AsGeoJSON(ST_SnapToGrid(func.ST_MakeLine(query_points3d.c.geom), coord_precision)))
+            
         else:
             # Else return the WKT of the geometry
             query_final = db.session \
                               .query(func.ST_AsText(ST_SnapToGrid(func.ST_MakeLine(query_points3d.c.geom), coord_precision)))
     else:
         raise InvalidUsage(500, 4002, "Needs to be a LineString, not a {}!".format(geometry.geom_type))
-        
+    
+    # Behaviour when all vertices are out of bounds
     if query_final[0][0] == None:
         raise InvalidUsage(500, 4002,
                            'The requested geometry is outside the bounds of {}'.format(dataset))
     # Behaviour when one vertex is out of bounds
-    elif query_final[0][0] == "LINESTRING Z EMPTY" or json.loads(query_final[0][0])['coordinates'] == []:
-        raise InvalidUsage(500, 4002,
-                           'At least one vertex is outside the bounds of {}'.format(dataset))
+    elif format_out in ['polyline', 'encodedpolyline']:
+        if query_final[0][0] == "LINESTRING Z EMPTY":
+            raise InvalidUsage(500, 4002,
+                               'At least one vertex is outside the bounds of {}'.format(dataset))
+    elif format_out == 'geojson':
+        if json.loads(query_final[0][0])['coordinates'] == []:
+            raise InvalidUsage(500, 4002,
+                               'At least one vertex is outside the bounds of {}'.format(dataset))            
         
     return query_final[0][0]
 
