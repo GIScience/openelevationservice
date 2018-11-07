@@ -11,7 +11,7 @@ addons:
   apt:
     packages:
     - postgresql-9.3
-    - postgresql-9.3-postgis-2.1
+    - postgresql-9.3-postgis-2.4
 
 before_install:
   - /bin/bash -c "DEBIAN_FRONTEND=noninteractive sudo apt-get install -y tzdata"
