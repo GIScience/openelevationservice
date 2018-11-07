@@ -31,8 +31,8 @@ def downloadsrtm(xy_range):
     # Create session for authentication
     session = requests.Session()
     
-    user = environ.get('SRTMPASS')
-    pw = environ.get('SRTMUSER')
+    pw = environ.get('SRTMPASS')
+    user = environ.get('SRTMUSER')
     if not user and not pw:
         auth = tuple(SETTINGS['srtm_parameters'].values())
     else:
