@@ -16,7 +16,7 @@ before_install:
   - sudo dpkg-reconfigure --frontend noninteractive tzdata
   # symlink raster2pgsql
   - sudo apt-get update -qq
-  - sudo apt-get install -y postgresql-9.4-postgis-2.3
+  - sudo apt-get install -y postgis
   - ln -s /usr/bin/raster2pgsql ./bin/raster2pgsql
 
 env:
