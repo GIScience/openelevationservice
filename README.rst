@@ -3,7 +3,7 @@
     :alt: Build status
 
 .. image:: https://readthedocs.org/projects/openelevationservice/badge/?version=latest
-   :target: https://readthedocs.org/projects/openelevationservice
+   :target: https://openelevationservice.readthedocs.io/en/latest/
    :alt: Documentation Status
 
 Quickstart
@@ -58,13 +58,13 @@ Run Docker container
    ``sudo docker-compose up -d``
 
 3. Create the database
-   ``sudo docker exec run -it flask create``
+   ``sudo docker exec run -it <container ID> flask create``
 
 4. Download SRTM data
 
 .. code-block:: bash
 
-    sudo docker exec -it bash -c "source /oes_venv/bin/activate; export OES_LOGLEVEL=DEBUG; flask download --xyrange=0,0,73,25"
+    sudo docker exec -it <container ID> bash -c "source /oes_venv/bin/activate; export OES_LOGLEVEL=DEBUG; flask download --xyrange=0,0,73,25"
 
 The optional ``xyrange`` parameter specfies the ``minx,miny,maxx,maxy`` indices of the available tiles, default is ``0,0,73,25``. You can see a representation of indices in the map on the `CGIAR website`_.
 
@@ -74,7 +74,7 @@ The optional ``xyrange`` parameter specfies the ``minx,miny,maxx,maxy`` indices 
 
 .. code-block:: bash
 
-    sudo docker exec  -it bash -c "source /oes_venv/bin/activate; export OES_LOGLEVEL=DEBUG; flask importdata"
+    sudo docker exec  -it <container ID> bash -c "source /oes_venv/bin/activate; export OES_LOGLEVEL=DEBUG; flask importdata"
 
 The import command will import whatever ``.tif`` files it finds in ``./tiles``. Now, it's time to grab a coffee, this might take a while. Expect a few hours for a remote database connection with HDD's and the global dataset.
 
@@ -199,6 +199,16 @@ openelevationservice recognizes the following environment variables:
 +-----------------+-----------------------------------------+-------------------------------------------------------+-----------------------------+
 
 In the case of the Docker setup, you don't need to worry about environment variables for the most part.
+
+Testing
+########################################################
+
+The testing framework is `nosetests`, which makes it very easy to run the tests:
+
+.. code-block:: bash
+
+    TESTING=true nosetests -v
+
 
 Usage
 --------------------------------------------------------
