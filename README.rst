@@ -63,7 +63,10 @@ Run Docker container
    ``sudo docker-compose up -d``
 
 3. Create the database
-   ``sudo docker exec run -it <container ID> flask create``
+
+.. code-block:: bash
+
+    sudo docker exec -it <container ID> bash -c "source /oes_venv/bin/activate; export OES_LOGLEVEL=DEBUG; flask create"
 
 4. Download SRTM data
 
@@ -79,11 +82,11 @@ The optional ``xyrange`` parameter specfies the ``minx,miny,maxx,maxy`` indices 
 
 .. code-block:: bash
 
-    sudo docker exec  -it <container ID> bash -c "source /oes_venv/bin/activate; export OES_LOGLEVEL=DEBUG; flask importdata"
+    sudo docker exec  -it <container ID> bash -c "source /oes_venv/bin/activate; flask importdata"
 
 The import command will import whatever ``.tif`` files it finds in ``./tiles``. Now, it's time to grab a coffee, this might take a while. Expect a few hours for a remote database connection with HDD's and the global dataset.
 
-After it's all finished, the service will listen on port ``5020`` of your host machine, unless specified differently in ``docker-compose.yml``
+After it's all finished, the service will listen on port ``5020`` of your host machine, unless specified differently in ``docker-compose.yml``.
 
 
 .. _`Kartoza's docker`: https://github.com/kartoza/docker-postgis
@@ -204,6 +207,16 @@ openelevationservice recognizes the following environment variables:
 +-----------------+-----------------------------------------+-------------------------------------------------------+-----------------------------+
 
 In the case of the Docker setup, you don't need to worry about environment variables for the most part.
+
+CLI
+##########################################################
+
+The flask command line interface has a few additional commands:
+
+-  ``flask create``: creates a table for CGIAR data
+- ```flask download --xyrange=0,73,0,25``: downloads CGIAR data and limits the X, Y indices optionally with ``xyrange``
+- ``flask importdata``: imports CGIAR tiles it finds in ``./tiles/``
+- ``flask drop``: drops CGIAR table
 
 Testing
 ########################################################
