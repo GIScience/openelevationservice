@@ -27,6 +27,11 @@ For issues and improvement suggestions, use the repo's `issue tracker`_.
 
 This service is part of the GIScience_ software stack, crafted at `HeiGIT institute`_ at the University of Heidelberg.
 
+You can also use our `free API`_ via (also check Endpoints_ for usage):
+
+- https://api.openrouteservice.org/elevation/point?api_key=YOUR_KEY
+- https://api.openrouteservice.org/elevation/line?api_key=YOUR_KEY
+
 .. _GIScience: https://github.com/GIScience
 .. _`HeiGIT institute`: https://heigit.org
 .. _`SRTM v4.1`: http://srtm.csi.cgiar.org
