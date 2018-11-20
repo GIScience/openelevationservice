@@ -1,4 +1,6 @@
 swagger: "2.0"
+tags:
+  - "elevation"
 info:
   description: |
             Returns elevation for point or line geometries by building 3D geometries from freely available data sources.
