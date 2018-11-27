@@ -39,6 +39,7 @@ You can also use our `free API`_ via (also check Endpoints_ for usage):
 .. _forum: https://ask.openrouteservice.org/c/elevation
 .. _`issue tracker`: https://github.com/GIScience/openelevationservice/issues
 .. _flasgger: https://github.com/rochacbruno/flasgger
+.. _`free API`: https://openrouteservice.org/sign-up
 
 Installation
 ----------------------------------------------------
@@ -57,7 +58,7 @@ Prerequisites
 Run Docker container
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-1. Customize `ops_settings_docker.sample.yml` to your needs and name it `ops_settings_docker.yml`
+1. Customize ``ops_settings_docker.sample.yml`` to your needs and name it ``ops_settings_docker.yml``
 
 2. Build container
    ``sudo docker-compose up -d``
@@ -181,7 +182,7 @@ The openelevationservice exposes 2 endpoints:
 
 For more detailed information, please visit the `API documentation`_.
 
-When hosted locally, visit https://localhost:5000/apidocs.
+When hosted locally, visit ``https://localhost:5000/apidocs``.
 
 .. _`API documentation`: https://coming.soon
 
