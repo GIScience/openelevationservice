@@ -163,11 +163,11 @@ The openelevationservice exposes 2 endpoints:
 +-----------------------+-------------------+------------+---------+--------------------------------------+
 |       Endpoint        | Method(s) allowed | Parameter  | Default | Values                               |
 +=======================+===================+============+=========+======================================+
-| ``/elevation/line``   | POST              | format_in  |    --   | geojson, linestring, encodedpolyline |
+| ``/elevation/line``   | POST              | format_in  |    --   | geojson, polyline, encodedpolyline   |
 |                       |                   +------------+---------+--------------------------------------+
 |                       |                   | geometry   |    --   | depends on ``format_in``             |
 |                       |                   +------------+---------+--------------------------------------+
-|                       |                   | format_out | geojson | geojson, linestring, encodedpolyline |
+|                       |                   | format_out | geojson | geojson, polyline, encodedpolyline   |
 |                       |                   +------------+---------+--------------------------------------+
 |                       |                   | dataset    | srtm    | srtm (so far)                        |
 +-----------------------+-------------------+------------+---------+--------------------------------------+
