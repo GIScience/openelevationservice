@@ -1,3 +1,4 @@
+.idea/
 run_travis.sh
 .venv/
 .spyproject/

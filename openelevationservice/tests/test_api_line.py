@@ -24,9 +24,10 @@ valid_line_polyline = dict(format_in='polyline',
 valid_line_encoded = dict(format_in='encodedpolyline',
                           geometry='u`rgFswjpAKD')
 
+
 class LineTest(BaseTestCase):
         
-    def test_output_geojson(self):
+    def test_input_geojson_output_geojson(self):
         geom = deepcopy(valid_line_geojson)
         geom.update({'format_out': 'geojson'})
         response = self.client.post('elevation/line',
@@ -37,6 +38,18 @@ class LineTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(('type', 'LineString'), list(j['geometry'].items()))
         self.assertEqual(len(j['geometry']['coordinates']), 2)
+
+    def test_input_geojson_output_encodedpolyline(self):
+        geom = deepcopy(valid_line_geojson)
+        geom.update({'format_out': 'encodedpolyline'})
+        response = self.client.post('elevation/line',
+                                    json=geom,
+                                    )
+
+        j = response.get_json()
+        print(j)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(j['geometry'], 'u`rgFswjpA_aMKD?')
     
     def test_output_polyline(self):
         geom = deepcopy(valid_line_polyline)
@@ -59,7 +72,7 @@ class LineTest(BaseTestCase):
         j = response.get_json()
         
         self.assertEqual(response.status_code, 200)
-        self.assertIsInstance(j['geometry'], str)
+        self.assertEqual(j['geometry'], 'u`rgFswjpA_aMKD?')
     
     def test_exceed_maximum_nodes(self):
         dummy_list = [[x, x] for x in range(SETTINGS['maximum_nodes'] + 1)]
