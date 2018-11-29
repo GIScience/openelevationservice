@@ -1,9 +1,11 @@
 swagger: "2.0"
 tags:
 - name: "Elevation"
+  description: |
+    Returns elevation for point or line geometries by building 3D geometries from freely available data sources.
 info:
   description: |
-            Returns elevation for point or line geometries by building 3D geometries from freely available data sources.
+    Returns elevation for point or line geometries by building 3D geometries from freely available data sources.
   version: "0.1"
   title: "openelevationservice"
   contact:
@@ -49,7 +51,9 @@ responses:
 paths:
   "/elevation/line":
     post:
-      summary:  "Enrich 2D lines with elevation."
+      tags:
+      - "Elevation"
+      summary:  "Elevation Service"
       description: |
         This endpoint can take planar 2D line objects and enrich them with elevation from a variety of datasets.
 
@@ -71,18 +75,21 @@ paths:
                 }'
         ```
       parameters:
-        - name: "api_key"
-          in: "query"
-          description: |
-            Insert your API Key here.
-          type: "string"
-          required: true
-          default: "your-api-key"
-        - in: body
-          name: body
-          description: Query the elevation of a line in various formats.
-          schema:
-            $ref: '#/definitions/LineGeometryPost'
+      - name: "api_key"
+        in: "query"
+        description: |
+          Insert your API Key here.
+        type: "string"
+        required: true
+        default: "your-api-key"
+      - in: body
+        name: body
+        description: Query the elevation of a line in various formats.
+        default: '{"format_in":"polyline","format_out":"encodedpolyline","geometry":[[13.349762,38.11295],[12.638397,37.645772]]}'
+        schema:
+          $ref: '#/definitions/LineGeometryPost'
+          example: '{"format_in":"polyline","format_out":"encodedpolyline","geometry":[[13.349762,38.11295],[12.638397,37.645772]]}'
+
       responses:
         200:
           $ref: "#/responses/success"
@@ -94,6 +101,8 @@ paths:
           $ref: "#/responses/serverissue"
   "/elevation/point":
     post:
+      tags:
+      - "Elevation"
       summary:  Enrich a point with elevation.
       description: |
         This endpoint can take a 2D point and enrich it with elevation from a variety of datasets.
@@ -117,18 +126,20 @@ paths:
             }'
         ```
       parameters:
-        - name: "api_key"
-          in: "query"
-          description: |
-            Insert your API Key here.
-          type: "string"
-          required: true
-          default: "your-api-key"
-        - in: body
-          name: body
-          description: Query the elevation of a point in various formats.
-          schema:
-            $ref: '#/definitions/PointGeometryPost'
+      - name: "api_key"
+        in: "query"
+        description: |
+          Insert your API Key here.
+        type: "string"
+        required: true
+        default: "your-api-key"
+      - in: body
+        name: body
+        description: Query the elevation of a point in various formats.
+        default: '{"format_in":"geojson","format_out":"geojson","geometry":{"coordinates":[13.349762,38.11295],"type":"Point"}}'
+        schema:
+          example: '{"format_in":"geojson","format_out":"geojson","geometry":{"coordinates":[13.349762,38.11295],"type":"Point"}}'
+          $ref: '#/definitions/PointGeometryPost'
       responses:
         200:
           $ref: "#/responses/success"
@@ -139,6 +150,8 @@ paths:
         500:
           $ref: "#/responses/serverissue"
     get:
+      tags:
+      - "Elevation"
       summary: Enrich a point with elevation.
       description: |
         This endpoint can take a 2D point and enrich it with elevation from a variety of datasets.
@@ -153,36 +166,34 @@ paths:
           curl -XGET https://localhost:5000/elevation/point?geometry=13.349762,38.11295
         ```
       parameters:
-        - name: "api_key"
-          in: "query"
-          description: |
-            Insert your API Key here.
-          type: "string"
-          required: true
-          default: "your-api-key"
-        - in: query
-          name: geometry
-          description: The point to be queried, in comma-separated lon,lat values, e.g. [13.349762, 38.11295]
-          required: true
-          type: array
-          items:
-            type: double
-          example:
-            - 13.349762
-            - 38.11295
-        - in: query
-          name: format_out
-          description: The output format to be returned.
-          enum: [geojson, point]
-          example: point
-          default: geojson
-        - in: query
-          name: dataset
-          description: The elevation dataset to be used.
-          type: string
-          enum: [srtm]
-          example: srtm
-          default: srtm
+      - name: "api_key"
+        in: "query"
+        description: |
+          Insert your API Key here.
+        type: "string"
+        required: true
+        default: "your-api-key"
+      - in: query
+        name: geometry
+        description: The point to be queried, in comma-separated lon,lat values, e.g. [13.349762, 38.11295]
+        required: true
+        type: array
+        items:
+          type: double
+        default: [13.349762,38.11295]
+        example: [13.349762,38.11295]
+      - in: query
+        name: format_out
+        type: string
+        description: The output format to be returned.
+        enum: [geojson, point]
+        apiDefault: geojson
+      - in: query
+        name: dataset
+        description: The elevation dataset to be used.
+        type: string
+        enum: [srtm]
+        apiDefault: srtm
       responses:
         200:
           $ref: "#/responses/success"
@@ -196,8 +207,8 @@ definitions:
   LineGeometryPost:
     type: object
     required:
-      - format_in
-      - geometry
+    - format_in
+    - geometry
     properties:
       format_in:
         type: string
@@ -229,31 +240,31 @@ definitions:
           * encodedpolyline: A <a href="https://developers.google.com/maps/documentation/utilities/polylinealgorithm">Google encoded polyline</a>, e.g.
                    u`rgFswjpAKD
     example:
-       {"format_in": "geojson",
-        "format_out": "geojson",
-        "dataset": "srtm",
-        "geometry": {
-                     "type": "LineString",
-                     "coordinates": [
-                        [13.331302, 38.108433],
-                        [13.331273, 38.10849]
-                     ]
-                    }
-        }
+      {"format_in": "geojson",
+       "format_out": "geojson",
+       "dataset": "srtm",
+       "geometry": {
+         "type": "LineString",
+         "coordinates": [
+         [13.331302, 38.108433],
+         [13.331273, 38.10849]
+         ]
+       }
+      }
 
   PointGeometryPost:
     type: object
     required:
-      - format_in
-      - geometry
+    - format_in
+    - geometry
     example:
       {"format_in": "geojson",
-      "format_out": "geojson",
-      "dataset": "srtm",
-      "geometry": {
-               "type": "Point",
-               "coordinates": [13.331302, 38.108433]
-              }
+       "format_out": "geojson",
+       "dataset": "srtm",
+       "geometry": {
+         "type": "Point",
+         "coordinates": [13.331302, 38.108433]
+       }
       }
     properties:
       format_in:
