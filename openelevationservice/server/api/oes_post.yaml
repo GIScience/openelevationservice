@@ -53,7 +53,7 @@ paths:
     post:
       tags:
       - "Elevation"
-      summary:  "Elevation Service"
+      summary:  "Elevation Line Service"
       description: |
         This endpoint can take planar 2D line objects and enrich them with elevation from a variety of datasets.
 
@@ -103,7 +103,7 @@ paths:
     post:
       tags:
       - "Elevation"
-      summary:  Enrich a point with elevation.
+      summary:  "Elevation Point Service"
       description: |
         This endpoint can take a 2D point and enrich it with elevation from a variety of datasets.
 
@@ -152,7 +152,7 @@ paths:
     get:
       tags:
       - "Elevation"
-      summary: Enrich a point with elevation.
+      summary: "Elevation Point Service"
       description: |
         This endpoint can take a 2D point and enrich it with elevation from a variety of datasets.
 
