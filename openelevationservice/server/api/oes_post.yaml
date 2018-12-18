@@ -62,17 +62,16 @@ paths:
           * Polyline
           * <a href="https://developers.google.com/maps/documentation/utilities/polylinealgorithm">Google's Encoded polyline</a>
 
-        Example:
+        Examples:
         ```
           # POST LineString as polyline
-          curl -XPOST https://api.openrouteservice.org/elevation/line?api_key=INSERT_YOUR_KEY \
-            -H 'Content-Type: application/json' \
-            -d '{
-              "format_in": "polyline",
-              "format_out": "encodedpolyline",
-              "geometry": [[13.349762, 38.11295],
-                           [12.638397, 37.645772]]
-                }'
+          # https://api.openrouteservice.org/elevation/line?api_key=YOUR-KEY
+          {
+            "format_in": "polyline",
+            "format_out": "encodedpolyline",
+            "geometry": [[13.349762, 38.11295],
+                         [12.638397, 37.645772]]
+          }
         ```
       parameters:
       - name: "api_key"
@@ -190,7 +189,7 @@ paths:
         Example:
         ```
           # GET point
-          curl -XGET https://localhost:5000/elevation/point?geometry=13.349762,38.11295
+          https://localhost:5000/elevation/point?geometry=13.349762,38.11295&api_key=YOUR_KEY
         ```
       parameters:
       - name: "api_key"

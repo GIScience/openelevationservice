@@ -10,8 +10,8 @@ Welcome to openelevationservice's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-.. include:: ../../README.rst
-.. include:: openelevationservice
+   readme_link
+   openelevationservice
 
-   readme_link.rst
-   openelevationservice.rst
+.. include:: ../../README.rst
+.. include:: openelevationservice.rst
