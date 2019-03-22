@@ -17,9 +17,9 @@ schema_post = {'geometry': {'anyof_type': ['object', 'list', 'string'], 'require
                'dataset': {'type': 'string', 'allowed': ['srtm'], 'default': 'srtm'}
                }
 
-schema_get = {'geometry': {'type': 'list', 'schema': {'type': 'string'}, 'required': True},
-              'format_out': {'type': 'list', 'schema': {'type': 'string', 'allowed': ['geojson', 'point']}, 'default': ['geojson']},
-              'dataset': {'type': 'list', 'schema': {'type': 'string', 'allowed': ['srtm']}, 'default': ['srtm']}
+schema_get = {'geometry': {'type': 'string', 'required': True},
+              'format_out': {'type': 'string', 'allowed': ['geojson', 'point'], 'default': 'geojson'},
+              'dataset': {'type': 'string', 'allowed': ['srtm'], 'default': 'srtm'}
               }
 
 def validate_request(request):
