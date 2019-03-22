@@ -75,9 +75,10 @@ def elevationpoint():
     """
     
     req_args = validator.validate_request(request)
+    log.debug(req_args)
     
     if request.method == 'POST':
-        
+
         # Check incoming parameters
         req_geometry = req_args['geometry']
         format_in = req_args['format_in']
@@ -90,13 +91,9 @@ def elevationpoint():
         if format_in == 'point':
             geom = convert.point_to_geometry(req_geometry)
     else:
-        # If request method is GET
-        # Coercing request ImmutableMultiDict to dict() makes the values lists,
-        # so we have to access the first elements
-        
-        req_geometry = req_args['geometry'][0]
-        format_out = req_args['format_out'][0]
-        dataset = req_args['dataset'][0]
+        req_geometry = req_args['geometry']
+        format_out = req_args['format_out']
+        dataset = req_args['dataset']
         try:
             # Catch errors when parsing the input string
             point_coords = [float(x) for x in req_geometry.split(',')]
