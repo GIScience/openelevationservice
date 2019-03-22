@@ -3,6 +3,7 @@
 from openelevationservice.server.api.api_exceptions import InvalidUsage
 from openelevationservice.server.utils import logger
 
+import math
 from shapely.geometry import shape, LineString, Point
 
 log = logger.get_logger(__name__)
@@ -159,8 +160,8 @@ def encode_polyline(coords, is3D):
     prev_z = 0
     
     for coord in coords:        
-        lng = int(coord[0] * 1e5)
-        lat = int(coord[1] * 1e5)
+        lng = _py2_round(coord[0] * 1e5)
+        lat = _py2_round(coord[1] * 1e5)
         
         d_lng = _encode_value(lng - prev_lng) 
         d_lat = _encode_value(lat - prev_lat)
@@ -197,3 +198,8 @@ def _encode_value(value):
     
     # Step 9-10
     return (chr(chunk + 63) for chunk in chunks)
+
+
+def _py2_round(x):
+    # The polyline algorithm uses Python 2's way of rounding
+    return int(math.copysign(math.floor(math.fabs(x) + 0.5), x))
