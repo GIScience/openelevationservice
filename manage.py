@@ -63,7 +63,7 @@ def _arg_format(xy_range_txt):
     
     str_split = [int(s.strip()) for s in xy_range_txt.split(',')]
     
-    xy_range = [[str_split[0], str_split[1]],
-                [str_split[2], str_split[3]]]
+    xy_range = [[str_split[0], str_split[2]],
+                [str_split[1], str_split[3]]]
     
     return xy_range
