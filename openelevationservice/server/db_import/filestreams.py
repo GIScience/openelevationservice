@@ -63,9 +63,9 @@ def downloadsrtm(xy_range):
                             # Write byte contents to file
                             with open(path.join(TILES_DIR, filename), 'wb') as f:
                                 f.write(data)        
-                log.debug("Downloaded file {}".format(link.text))
+                log.debug("Downloaded file {} to {}".format(link.text, TILES_DIR))
             else:
-                log.debug("File {} already esists.".format(link.text))
+                log.debug("File {} already exists in {}".format(link.text, TILES_DIR))
             
 
 def raster2pgsql():
