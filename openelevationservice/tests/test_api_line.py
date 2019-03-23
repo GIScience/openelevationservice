@@ -47,7 +47,6 @@ class LineTest(BaseTestCase):
                                     )
 
         j = response.get_json()
-        print(j)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(j['geometry'], 'u`rgFswjpA_aMKD?')
     
@@ -121,14 +120,3 @@ class LineTest(BaseTestCase):
         self.assertRaises(api_exceptions.InvalidUsage)
         self.assertEqual(response.get_json()['code'], 4002)
         self.assertIn(b'not a Point', response.data)
-    
-    def test_one_invalid_vertex(self):
-        mixed_coords = [valid_coords[0], invalid_coords[0]]
-        geom = deepcopy(valid_line_geojson)
-        geom.update(geometry={'coordinates': mixed_coords, 'type': 'LineString'})
-        response = self.client.post('elevation/line',
-                                    json=geom,
-                                    )
-        
-        self.assertRaises(api_exceptions.InvalidUsage)
-        self.assertEqual(response.get_json()['code'], 4002)

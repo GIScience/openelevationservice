@@ -1,4 +1,5 @@
 .idea/
+sql/
 run_travis.sh
 .venv/
 .spyproject/
