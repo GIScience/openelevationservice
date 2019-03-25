@@ -39,7 +39,7 @@ def validate_request(request):
         v.validate(dict(request.args), schema_get)
     
     if request.method == 'POST':
-        if not 'application/json' in request.headers['Content-Type']:
+        if request.headers.get('Content-Type') != 'application/json':
             raise api_exceptions.InvalidUsage(500, 
                                               4001,
                                               "Content-Type header is not application/json")
