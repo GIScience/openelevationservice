@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 -
 ### Fixed
 
+- add polyline6 support (#11)
 - fix consecutive same coordinates being scrubbed (#8)
 - rounding issues in encode polyline (#9)
 - download_data confused x and y (no issue)
