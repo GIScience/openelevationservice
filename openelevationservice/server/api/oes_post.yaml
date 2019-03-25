@@ -60,7 +60,7 @@ paths:
         The input and output formats are:
           * GeoJSON
           * Polyline
-          * <a href="https://developers.google.com/maps/documentation/utilities/polylinealgorithm">Google's Encoded polyline</a>
+          * <a href="https://developers.google.com/maps/documentation/utilities/polylinealgorithm">Google's Encoded polyline</a> with coordinate precision 5 or 6
 
         Example:
         ```
@@ -70,8 +70,8 @@ paths:
             -H 'Authorization: INSERT_YOUR_KEY
             -d '{
               "format_in": "polyline",
-              "format_out": "encodedpolyline",
-              "geometry": [[13.349762, 38.11295],
+              "format_out": "encodedpolyline5",
+              "geometry": [[13.349762, 38.112952],
                            [12.638397, 37.645772]]
                 }'
         ```
@@ -87,7 +87,7 @@ paths:
         name: body
         required: true
         description: Query the elevation of a line in various formats.
-        example: '{"format_in":"polyline","format_out":"encodedpolyline","geometry":[[13.349762,38.11295],[12.638397,37.645772]]}'
+        example: '{"format_in":"polyline","format_out":"encodedpolyline5","geometry":[[13.349762,38.112952],[12.638397,37.645772]]}'
         type: object
 #        requiredParams:
 #        - format_in
@@ -214,14 +214,14 @@ definitions:
     format_in:
       type: string
       description: The input format the API has to expect.
-      enum: [geojson, polyline, encodedpolyline]
-      example: encodedpolyline
+      enum: [geojson, polyline, encodedpolyline5, encodedpolyline6]
+      example: encodedpolyline5
       required: true
     format_out:
       type: string
       description: The output format to be returned.
-      enum: [geojson, polyline, encodedpolyline]
-      apiDefault: encodedpolyline
+      enum: [geojson, polyline, encodedpolyline5, encodedpolyline6]
+      apiDefault: geojson
     dataset:
       type: string
       description: The elevation dataset to be used.
@@ -239,8 +239,11 @@ definitions:
         * polyline: A list of coordinate lists, e.g.
                  [[13.331302, 38.108433], [13.331273, 38.10849]]
 
-        * encodedpolyline: A <a href="https://developers.google.com/maps/documentation/utilities/polylinealgorithm">Google encoded polyline</a>, e.g.
+        * encodedpolyline5: A <a href="https://developers.google.com/maps/documentation/utilities/polylinealgorithm">Google encoded polyline</a> with a coordinate precision of 5, e.g.
                  u`rgFswjpAKD
+
+        * encodedpolyline6: A <a href="https://developers.google.com/maps/documentation/utilities/polylinealgorithm">Google encoded polyline</a> with a coordinate precision of 6, e.g.
+                 ap}tgAkutlXqBx@
 
   PointGeometryPostProps:
     format_in:
