@@ -10,6 +10,7 @@ from os import path
 
 app = create_app()
 
+
 class BaseTestCase(TestCase):
 
     def create_app(self):

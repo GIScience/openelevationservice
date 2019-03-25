@@ -51,6 +51,21 @@ def _trans(value, index):
 
 
 def decode(expression, precision=5, is3d=False):
+    """
+    Decodes Google encoded polyline format. Notable difference: the output is [X, Y], not [Lat, Long)!
+
+    :param expression: encoded string
+    :type enumerate: str
+
+    :param precision: Decimal precision of provided coordinates.
+    :type precision: int
+
+    :param is3d: Whether input string has elevation info.
+    :type is3d: bool
+
+    :return: LineString from decoded coordinates
+    :rtype: shapely.geometry.LineString
+    """
     coordinates, index, lat, lng, z, length, factor = [], 0, 0, 0, 0, len(expression), float(10 ** precision)
 
     while index < length:
@@ -70,6 +85,21 @@ def decode(expression, precision=5, is3d=False):
 
 
 def encode(coordinates, precision=5, is3d=False):
+    """
+    Encodes coordinates after Google's encoded polyline format. Able to encode arbitrary precision.
+
+    :param coordinates: list of coordinates in [Lon, Lat] order.
+    :type coordinates: lists of int
+
+    :param precision: Decimal precision to be encoded.
+    :type precision: int
+
+    :param is3d: Whether elevation should be encoded.
+    :type is3d: bool
+
+    :return: encoded polyline string
+    :rtype: str
+    """
     output, factor = six.StringIO(), int(10 ** precision)
 
     # Careful, Lnt/Lat are interchanged here, bcs PostGIS query outputs x, y, but encodedpolyline has the convention of
