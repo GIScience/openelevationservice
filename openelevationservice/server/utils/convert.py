@@ -3,7 +3,6 @@
 from openelevationservice.server.api.api_exceptions import InvalidUsage
 from openelevationservice.server.utils import logger
 
-import math
 from shapely.geometry import shape, LineString, Point
 
 log = logger.get_logger(__name__)
