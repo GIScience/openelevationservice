@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 -
 
 ### Fixed
-- 
+-
 
 ### Changed
 -
@@ -18,9 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Deprecated
 -
 
-
-## [0.2] - 2019-03-22
-
+## [0.2] - 2019-03-25
 ### Added
 -
 ### Fixed
