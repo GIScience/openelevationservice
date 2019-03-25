@@ -2,7 +2,7 @@
 
 from openelevationservice import SETTINGS
 from openelevationservice.server.api import api_exceptions
-from openelevationservice.server.utils import logger, convert
+from openelevationservice.server.utils import logger, convert, codec
 from openelevationservice.server.api import querybuilder, validator
 from openelevationservice.server.api.response import ResponseBuilder
 
@@ -36,10 +36,16 @@ def elevationline():
     # Get the geometry
     if format_in == 'geojson':
         geom = convert.geojson_to_geometry(geometry_str)
-    elif format_in == 'encodedpolyline':
-        geom = convert.decode_polyline(geometry_str, False)
+    elif format_in in ['encodedpolyline', 'encodedpolyline5']:
+        geom = codec.decode(geometry_str, precision=5, is3d=False)
+    elif format_in == 'encodedpolyline6':
+        geom = codec.decode(geometry_str, precision=6, is3d=False)
     elif format_in == 'polyline':
         geom = convert.polyline_to_geometry(geometry_str)
+    else:
+        raise api_exceptions.InvalidUsage(500,
+                                          4000,
+                                          f'Invalid format_in value "{format_in}"')
         
     if len(list(geom.coords)) > SETTINGS['maximum_nodes']:
         raise api_exceptions.InvalidUsage(status_code=500,
@@ -53,8 +59,10 @@ def elevationline():
     if format_out != 'geojson':
         geom_out = wkt.loads(geom_queried)
         coords = geom_out.coords
-        if format_out == 'encodedpolyline':
-            results['geometry'] = convert.encode_polyline(coords, True)
+        if format_out in ['encodedpolyline', 'encodedpolyline5']:
+            results['geometry'] = codec.encode(coords, precision=5, is3d=True)
+        elif format_out == 'encodedpolyline6':
+            results['geometry'] = codec.encode(coords, precision=6, is3d=True)
         else:
             results['geometry'] = list(coords)
     else:
@@ -115,5 +123,3 @@ def elevationpoint():
         results['geometry'] = json.loads(geom_queried)
 
     return jsonify(results)
-            
-   

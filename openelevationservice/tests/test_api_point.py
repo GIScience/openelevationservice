@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from openelevationservice.tests.base import BaseTestCase
+from openelevationservice.tests import BaseTestCase
 from openelevationservice.server.api import api_exceptions
 
 from copy import deepcopy
