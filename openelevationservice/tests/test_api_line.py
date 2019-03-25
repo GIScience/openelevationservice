@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from openelevationservice.tests.base import BaseTestCase
+from openelevationservice.tests import BaseTestCase
 from openelevationservice import SETTINGS
 from openelevationservice.server.api import api_exceptions
 
@@ -21,8 +21,11 @@ valid_line_polyline = dict(format_in='polyline',
                            geometry=valid_coords)
 
 
-valid_line_encoded = dict(format_in='encodedpolyline',
-                          geometry='u`rgFswjpAKD')
+polyline5 = dict(format_in='encodedpolyline5',
+                 geometry='u`rgFswjpAKD')
+
+polyline6 = dict(format_in='encodedpolyline6',
+                 geometry='ap}tgAkutlXqBx@')
 
 
 class LineTest(BaseTestCase):
@@ -47,7 +50,6 @@ class LineTest(BaseTestCase):
                                     )
 
         j = response.get_json()
-        print(j)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(j['geometry'], 'u`rgFswjpA_aMKD?')
     
@@ -63,9 +65,9 @@ class LineTest(BaseTestCase):
         self.assertIsInstance(j['geometry'], list)
         self.assertEqual(len(j['geometry']), 2)
     
-    def test_output_encodedpolyline(self):
-        geom = deepcopy(valid_line_encoded)
-        geom.update({'format_out': 'encodedpolyline'})
+    def test_output_polyline5(self):
+        geom = deepcopy(polyline5)
+        geom.update({'format_out': 'encodedpolyline5'})
         response = self.client.post('elevation/line',
                                     json=geom)
         
@@ -73,6 +75,17 @@ class LineTest(BaseTestCase):
         
         self.assertEqual(response.status_code, 200)
         self.assertEqual(j['geometry'], 'u`rgFswjpA_aMKD?')
+
+    def test_output_polyline6(self):
+        geom = deepcopy(polyline6)
+        geom.update({'format_out': 'encodedpolyline6'})
+        response = self.client.post('elevation/line',
+                                    json=geom)
+
+        j = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(j['geometry'], 'ap}tgAkutlX_aMqBx@?')
     
     def test_exceed_maximum_nodes(self):
         dummy_list = [[x, x] for x in range(SETTINGS['maximum_nodes'] + 1)]
@@ -121,14 +134,3 @@ class LineTest(BaseTestCase):
         self.assertRaises(api_exceptions.InvalidUsage)
         self.assertEqual(response.get_json()['code'], 4002)
         self.assertIn(b'not a Point', response.data)
-    
-    def test_one_invalid_vertex(self):
-        mixed_coords = [valid_coords[0], invalid_coords[0]]
-        geom = deepcopy(valid_line_geojson)
-        geom.update(geometry={'coordinates': mixed_coords, 'type': 'LineString'})
-        response = self.client.post('elevation/line',
-                                    json=geom,
-                                    )
-        
-        self.assertRaises(api_exceptions.InvalidUsage)
-        self.assertEqual(response.get_json()['code'], 4002)

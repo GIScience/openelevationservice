@@ -2,7 +2,7 @@
 
 from openelevationservice import SETTINGS
 from openelevationservice.server.api import api_exceptions
-from openelevationservice.server.utils import logger, convert
+from openelevationservice.server.utils import logger, convert, codec
 from openelevationservice.server.api import querybuilder, validator
 from openelevationservice.server.api.response import ResponseBuilder
 
@@ -36,13 +36,19 @@ def elevationline():
     # Get the geometry
     if format_in == 'geojson':
         geom = convert.geojson_to_geometry(geometry_str)
-    elif format_in == 'encodedpolyline':
-        geom = convert.decode_polyline(geometry_str, False)
+    elif format_in in ['encodedpolyline', 'encodedpolyline5']:
+        geom = codec.decode(geometry_str, precision=5, is3d=False)
+    elif format_in == 'encodedpolyline6':
+        geom = codec.decode(geometry_str, precision=6, is3d=False)
     elif format_in == 'polyline':
         geom = convert.polyline_to_geometry(geometry_str)
+    else:
+        raise api_exceptions.InvalidUsage(400,
+                                          4000,
+                                          f'Invalid format_in value "{format_in}"')
         
     if len(list(geom.coords)) > SETTINGS['maximum_nodes']:
-        raise api_exceptions.InvalidUsage(status_code=500,
+        raise api_exceptions.InvalidUsage(status_code=400,
                                           error_code=4003,
                                           message='Maximum number of nodes exceeded.')
                 
@@ -53,12 +59,18 @@ def elevationline():
     if format_out != 'geojson':
         geom_out = wkt.loads(geom_queried)
         coords = geom_out.coords
-        if format_out == 'encodedpolyline':
-            results['geometry'] = convert.encode_polyline(coords, True)
+        if format_out in ['encodedpolyline', 'encodedpolyline5']:
+            results['geometry'] = codec.encode(coords, precision=5, is3d=True)
+        elif format_out == 'encodedpolyline6':
+            results['geometry'] = codec.encode(coords, precision=6, is3d=True)
         else:
             results['geometry'] = list(coords)
-    else:
+    elif format_out == 'geojson':
         results['geometry'] = json.loads(geom_queried)
+    else:
+        raise api_exceptions.InvalidUsage(400,
+                                          4000,
+                                          f'Invalid format_out value "{format_out}"')
     
     return jsonify(results)
 
@@ -75,9 +87,10 @@ def elevationpoint():
     """
     
     req_args = validator.validate_request(request)
+    log.debug(req_args)
     
     if request.method == 'POST':
-        
+
         # Check incoming parameters
         req_geometry = req_args['geometry']
         format_in = req_args['format_in']
@@ -87,16 +100,18 @@ def elevationpoint():
         # Get the geometry
         if format_in == 'geojson':
             geom = convert.geojson_to_geometry(req_geometry)
-        if format_in == 'point':
+        elif format_in == 'point':
             geom = convert.point_to_geometry(req_geometry)
+        else:
+            raise api_exceptions.InvalidUsage(
+                400,
+                4000,
+                f"Invalid format_in value {format_in}"
+            )
     else:
-        # If request method is GET
-        # Coercing request ImmutableMultiDict to dict() makes the values lists,
-        # so we have to access the first elements
-        
-        req_geometry = req_args['geometry'][0]
-        format_out = req_args['format_out'][0]
-        dataset = req_args['dataset'][0]
+        req_geometry = req_args['geometry']
+        format_out = req_args['format_out']
+        dataset = req_args['dataset']
         try:
             # Catch errors when parsing the input string
             point_coords = [float(x) for x in req_geometry.split(',')]
@@ -111,12 +126,14 @@ def elevationpoint():
     results = ResponseBuilder().__dict__
     geom_queried = querybuilder.point_elevation(geom, format_out, dataset)
     
-    if format_out != 'geojson':
+    if format_out == 'point':
         geom_out = wkt.loads(geom_queried)
         results['geometry'] = list(geom_out.coords[0])
-    else:
+    elif format_out == 'geojson':
         results['geometry'] = json.loads(geom_queried)
+    else:
+        raise api_exceptions.InvalidUsage(400,
+                                          4000,
+                                          f'Invalid format_out value "{format_out}"')
 
     return jsonify(results)
-            
-   

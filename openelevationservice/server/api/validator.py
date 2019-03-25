@@ -12,14 +12,14 @@ Validator.types_mapping['object'] = object_type
 v = Validator()
 
 schema_post = {'geometry': {'anyof_type': ['object', 'list', 'string'], 'required': True},
-               'format_in': {'type': 'string', 'allowed': ['geojson', 'point', 'encodedpolyline', 'polyline'], 'required': True},
-               'format_out': {'type': 'string', 'allowed': ['geojson', 'point', 'encodedpolyline', 'polyline'], 'default': 'geojson'},
+               'format_in': {'type': 'string', 'allowed': ['geojson', 'point', 'encodedpolyline', 'encodedpolyline5', 'encodedpolyline6', 'polyline'], 'required': True},
+               'format_out': {'type': 'string', 'allowed': ['geojson', 'point', 'encodedpolyline', 'encodedpolyline5', 'encodedpolyline6', 'polyline'], 'default': 'geojson'},
                'dataset': {'type': 'string', 'allowed': ['srtm'], 'default': 'srtm'}
                }
 
-schema_get = {'geometry': {'type': 'list', 'schema': {'type': 'string'}, 'required': True},
-              'format_out': {'type': 'list', 'schema': {'type': 'string', 'allowed': ['geojson', 'point']}, 'default': ['geojson']},
-              'dataset': {'type': 'list', 'schema': {'type': 'string', 'allowed': ['srtm']}, 'default': ['srtm']}
+schema_get = {'geometry': {'type': 'string', 'required': True},
+              'format_out': {'type': 'string', 'allowed': ['geojson', 'point'], 'default': 'geojson'},
+              'dataset': {'type': 'string', 'allowed': ['srtm'], 'default': 'srtm'}
               }
 
 def validate_request(request):
@@ -39,8 +39,8 @@ def validate_request(request):
         v.validate(dict(request.args), schema_get)
     
     if request.method == 'POST':
-        if not 'application/json' in request.headers['Content-Type']:
-            raise api_exceptions.InvalidUsage(500, 
+        if request.headers.get('Content-Type') != 'application/json':
+            raise api_exceptions.InvalidUsage(400,
                                               4001,
                                               "Content-Type header is not application/json")
 
@@ -50,7 +50,7 @@ def validate_request(request):
         errors = []
         for error in v.errors:
             errors.append("Argument '{}': {}".format(error, v.errors[error][0]))
-        raise api_exceptions.InvalidUsage(500,
+        raise api_exceptions.InvalidUsage(400,
                                           4000,
                                           ", ".join(errors))
     

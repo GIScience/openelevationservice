@@ -63,19 +63,14 @@ def downloadsrtm(xy_range):
                             # Write byte contents to file
                             with open(path.join(TILES_DIR, filename), 'wb') as f:
                                 f.write(data)        
-                log.debug("Downloaded file {}".format(link.text))
+                log.debug("Downloaded file {} to {}".format(link.text, TILES_DIR))
             else:
-                log.debug("File {} already esists.".format(link.text))
+                log.debug("File {} already exists in {}".format(link.text, TILES_DIR))
             
 
 def raster2pgsql():
     """
     Imports SRTM v4.1 tiles to PostGIS.
-    
-    :param xy_range: The range of tiles in x and y as per grid in 
-        http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp
-        in 'minx, maxx, miny, maxy.
-    :type xy_range: comma-separated range string
     
     :raises subprocess.CalledProcessError: Raised when raster2pgsql throws an error.
     """
@@ -89,7 +84,7 @@ def raster2pgsql():
     # Tried to import every raster individually by user-specified xyrange 
     # similar to download(), but raster2pgsql fuck it up somehow.. The PostGIS
     # raster will not be what one would expect. Instead doing a bulk import of all files.
-    cmd_raster2pgsql = r"raster2pgsql -s 4326 -a -C -M -P -t 50x50 {filename} {tablename} | psql -q -h {host} -p {port} -U {user_name} -d {db_name}"
+    cmd_raster2pgsql = r"raster2pgsql -s 4326 -a -C -M -P -t 50x50 {filename} {table_name} | psql -q -h {host} -p {port} -U {user_name} -d {db_name}"
     # -s: raster SRID
     # -a: append to table (assumes it's been create with 'create()')
     # -C: apply all raster Constraints
@@ -98,10 +93,9 @@ def raster2pgsql():
     # -t: specifies the pixel size of each row. Important to keep low for performance!
     
     cmd_raster2pgsql = cmd_raster2pgsql.format(**{'filename': path.join(TILES_DIR, '*.tif'),
-                                                  'tablename':pg_settings['table_name']},
-                                                  **pg_settings)
+                                                  **pg_settings})
     
-    proc = subprocess.Popen(cmd_raster2pgsql, 
+    proc = subprocess.Popen(cmd_raster2pgsql,
                          stdout=subprocess.PIPE, 
                          stderr=subprocess.STDOUT,
                          shell=True,

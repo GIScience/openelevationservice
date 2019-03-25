@@ -60,22 +60,24 @@ paths:
         The input and output formats are:
           * GeoJSON
           * Polyline
-          * <a href="https://developers.google.com/maps/documentation/utilities/polylinealgorithm">Google's Encoded polyline</a>
+          * <a href="https://developers.google.com/maps/documentation/utilities/polylinealgorithm">Google's Encoded polyline</a> with coordinate precision 5 or 6
 
-        Examples:
+        Example:
         ```
           # POST LineString as polyline
-          # https://api.openrouteservice.org/elevation/line?api_key=YOUR-KEY
-          {
-            "format_in": "polyline",
-            "format_out": "encodedpolyline",
-            "geometry": [[13.349762, 38.11295],
-                         [12.638397, 37.645772]]
-          }
+          curl -XPOST https://api.openrouteservice.org/elevation/line
+            -H 'Content-Type: application/json' \
+            -H 'Authorization: INSERT_YOUR_KEY
+            -d '{
+              "format_in": "polyline",
+              "format_out": "encodedpolyline5",
+              "geometry": [[13.349762, 38.112952],
+                           [12.638397, 37.645772]]
+                }'
         ```
       parameters:
-      - name: "api_key"
-        in: "query"
+      - name: "Authorization"
+        in: "header"
         description: |
           Insert your API Key here.
         type: "string"
@@ -83,12 +85,15 @@ paths:
         default: "your-api-key"
       - in: body
         name: body
+        required: true
         description: Query the elevation of a line in various formats.
-        default: '{"format_in":"polyline","format_out":"encodedpolyline","geometry":[[13.349762,38.11295],[12.638397,37.645772]]}'
-        schema:
+        example: '{"format_in":"polyline","format_out":"encodedpolyline5","geometry":[[13.349762,38.112952],[12.638397,37.645772]]}'
+        type: object
+#        requiredParams:
+#        - format_in
+#        - geometry
+        props:
           $ref: '#/definitions/LineGeometryPost'
-          example: '{"format_in":"polyline","format_out":"encodedpolyline","geometry":[[13.349762,38.11295],[12.638397,37.645772]]}'
-
       responses:
         200:
           $ref: "#/responses/success"
@@ -124,8 +129,8 @@ paths:
           }
         ```
       parameters:
-      - name: "api_key"
-        in: "query"
+      - name: "Authorization"
+        in: "header"
         description: |
           Insert your API Key here.
         type: "string"
@@ -134,10 +139,14 @@ paths:
       - in: body
         name: body
         description: Query the elevation of a point in various formats.
-        default: '{"format_in":"geojson","format_out":"geojson","geometry":{"coordinates":[13.349762,38.11295],"type":"Point"}}'
-        schema:
-          example: '{"format_in":"geojson","format_out":"geojson","geometry":{"coordinates":[13.349762,38.11295],"type":"Point"}}'
-          $ref: '#/definitions/PointGeometryPost'
+        example: '{"format_in":"geojson","format_out":"geojson","geometry":{"coordinates":[13.349762,38.11295],"type":"Point"}}'
+        type: object
+        required: true
+#        requiredParams:
+#        - format_in
+#        - geometry
+        properties:
+          $ref: '#/definitions/PointGeometryPostProps'
       responses:
         200:
           $ref: "#/responses/success"
@@ -161,7 +170,7 @@ paths:
         Example:
         ```
           # GET point
-          https://localhost:5000/elevation/point?geometry=13.349762,38.11295&api_key=YOUR_KEY
+          curl -XGET https://localhost:5000/elevation/point?geometry=13.349762,38.11295
         ```
       parameters:
       - name: "api_key"
@@ -170,7 +179,7 @@ paths:
           Insert your API Key here.
         type: "string"
         required: true
-        default: "your-api-key"
+        example: "your-api-key"
       - in: query
         name: geometry
         description: The point to be queried, in comma-separated lon,lat values, e.g. [13.349762, 38.11295]
@@ -178,8 +187,7 @@ paths:
         type: array
         items:
           type: double
-        default: [13.349762,38.11295]
-        example: [13.349762,38.11295]
+        example: "13.349762,38.11295"
       - in: query
         name: format_out
         type: string
@@ -203,94 +211,68 @@ paths:
           $ref: "#/responses/serverissue"
 definitions:
   LineGeometryPost:
-    type: object
-    required:
-    - format_in
-    - geometry
-    properties:
-      format_in:
-        type: string
-        description: The input format the API has to expect.
-        enum: [geojson, polyline, encodedpolyline]
-        example: encodedpolyline
-      format_out:
-        type: string
-        description: The output format to be returned.
-        enum: [geojson, polyline, encodedpolyline]
-        example: encodedpolyline
-        default: geojson
-      dataset:
-        type: string
-        description: The elevation dataset to be used.
-        enum: [srtm]
-        example: srtm
-        default: srtm
-      geometry:
-        type: object
-        description: |
-          * geojson: A geometry object of a LineString GeoJSON, e.g.
-                   {"type": "LineString",
-                    "coordinates": [[13.331302, 38.108433],[13.331273, 38.10849]]
-                   }
-          * polyline: A list of coordinate lists, e.g.
-                   [[13.331302, 38.108433], [13.331273, 38.10849]]
+    format_in:
+      type: string
+      description: The input format the API has to expect.
+      enum: [geojson, polyline, encodedpolyline5, encodedpolyline6]
+      example: encodedpolyline5
+      required: true
+    format_out:
+      type: string
+      description: The output format to be returned.
+      enum: [geojson, polyline, encodedpolyline5, encodedpolyline6]
+      apiDefault: geojson
+    dataset:
+      type: string
+      description: The elevation dataset to be used.
+      enum: [srtm]
+      apiDefault: srtm
+    geometry:
+      type: object
+      required: true
+      example: u`rgFswjpAKD
+      description: |
+        * geojson: A geometry object of a LineString GeoJSON, e.g.
+                 {"type": "LineString",
+                  "coordinates": [[13.331302, 38.108433],[13.331273, 38.10849]]
+                 }
+        * polyline: A list of coordinate lists, e.g.
+                 [[13.331302, 38.108433], [13.331273, 38.10849]]
 
-          * encodedpolyline: A <a href="https://developers.google.com/maps/documentation/utilities/polylinealgorithm">Google encoded polyline</a>, e.g.
-                   u`rgFswjpAKD
-    example:
-      {"format_in": "geojson",
-       "format_out": "geojson",
-       "dataset": "srtm",
-       "geometry": {
-         "type": "LineString",
-         "coordinates": [
-         [13.331302, 38.108433],
-         [13.331273, 38.10849]
-         ]
-       }
-      }
+        * encodedpolyline5: A <a href="https://developers.google.com/maps/documentation/utilities/polylinealgorithm">Google encoded polyline</a> with a coordinate precision of 5, e.g.
+                 u`rgFswjpAKD
 
-  PointGeometryPost:
-    type: object
-    required:
-    - format_in
-    - geometry
-    example:
-      {"format_in": "geojson",
-       "format_out": "geojson",
-       "dataset": "srtm",
-       "geometry": {
-         "type": "Point",
-         "coordinates": [13.331302, 38.108433]
-       }
-      }
-    properties:
-      format_in:
-        type: string
-        description: The input format the API has to expect.
-        enum: [geojson, point]
-        example: point
-      format_out:
-        type: string
-        description: The output format to be returned.
-        enum: [geojson, point]
-        example: point
-        default: geojson
-      dataset:
-        type: string
-        description: The elevation dataset to be used.
-        enum: [srtm]
-        example: srtm
-        default: srtm
-      geometry:
-        type: object
-        description: |
-          * geojson: A geometry object of a Point GeoJSON, e.g.
-                   {"type": "Point",
-                    "coordinates": [13.331273, 38.10849]
-                   }
-          * point: A coordinate list, e.g.
-                   [13.331273, 38.10849]
+        * encodedpolyline6: A <a href="https://developers.google.com/maps/documentation/utilities/polylinealgorithm">Google encoded polyline</a> with a coordinate precision of 6, e.g.
+                 ap}tgAkutlXqBx@
+
+  PointGeometryPostProps:
+    format_in:
+      type: string
+      description: The input format the API has to expect.
+      enum: [geojson, point]
+      example: point
+      required: true
+    format_out:
+      type: string
+      description: The output format to be returned.
+      enum: [geojson, point]
+      apiDefault: geojson
+    dataset:
+      type: string
+      description: The elevation dataset to be used.
+      enum: [srtm]
+      apiDefault: srtm
+    geometry:
+      type: object
+      example: [13.331273, 38.10849]
+      required: true
+      description: |
+        * geojson: A geometry object of a Point GeoJSON, e.g.
+                 {"type": "Point",
+                  "coordinates": [13.331273, 38.10849]
+                 }
+        * point: A coordinate list, e.g.
+                 [13.331273, 38.10849]
 
   GeoJSONResponse:
     type: object

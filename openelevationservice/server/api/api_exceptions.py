@@ -6,7 +6,7 @@ from openelevationservice.server.api import error_codes
 class InvalidUsage(Exception):
     """Provides more detailed description of internal 500 error."""
 
-    def __init__(self, status_code=500, error_code=None, message=None):
+    def __init__(self, status_code=400, error_code=None, message=None):
         """
         :param status_code: the HTTP status code
         :type status_code: integer

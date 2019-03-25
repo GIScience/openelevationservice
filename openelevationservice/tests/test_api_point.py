@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from openelevationservice.tests.base import BaseTestCase
+from openelevationservice.tests import BaseTestCase
 from openelevationservice.server.api import api_exceptions
 
 from copy import deepcopy
@@ -77,9 +77,9 @@ class PointTest(BaseTestCase):
         
     def test_schema_get_wrong(self):
         response = self.client.get('elevation/point',
-                                    query_string={'format_out': 'geoJson',
-                                                  'dataset': 'SRTM',
-                                                  'api_key': 540032})
+                                    query_string=dict(format_out='geoJson',
+                                                  dataset='SRTM',
+                                                  api_key=540032))
     
         self.assertRaises(api_exceptions.InvalidUsage)
         self.assertEqual(response.get_json()['code'], 4000)
