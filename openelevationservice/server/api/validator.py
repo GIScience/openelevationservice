@@ -40,7 +40,7 @@ def validate_request(request):
     
     if request.method == 'POST':
         if request.headers.get('Content-Type') != 'application/json':
-            raise api_exceptions.InvalidUsage(500, 
+            raise api_exceptions.InvalidUsage(400,
                                               4001,
                                               "Content-Type header is not application/json")
 
@@ -50,7 +50,7 @@ def validate_request(request):
         errors = []
         for error in v.errors:
             errors.append("Argument '{}': {}".format(error, v.errors[error][0]))
-        raise api_exceptions.InvalidUsage(500,
+        raise api_exceptions.InvalidUsage(400,
                                           4000,
                                           ", ".join(errors))
     

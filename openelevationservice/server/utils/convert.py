@@ -23,7 +23,7 @@ def geojson_to_geometry(geometry_str):
     try:
         geom = shape(geometry_str)
     except Exception as e:
-        raise InvalidUsage(status_code=500,
+        raise InvalidUsage(status_code=400,
                           error_code=4002,
                           message=str(e))
     return geom
@@ -45,7 +45,7 @@ def point_to_geometry(point):
     try:
         geom = Point(point)
     except Exception as e:
-        raise InvalidUsage(status_code=500,
+        raise InvalidUsage(status_code=400,
                           error_code=4002,
                           message=str(e))
     return geom
@@ -66,7 +66,7 @@ def polyline_to_geometry(point_list):
     try:
         geom = LineString(point_list)
     except Exception as e:
-        raise InvalidUsage(status_code=500,
+        raise InvalidUsage(status_code=400,
                           error_code=4002,
                           message=str(e))
     return geom
