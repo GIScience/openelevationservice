@@ -35,7 +35,7 @@ def _write(output, curr_value, prev_value, factor):
         coord >>= 5
 
     output.write(six.unichr(coord + 63))
-    
+
 
 def _trans(value, index):
     byte, result, shift = None, 0, 0
