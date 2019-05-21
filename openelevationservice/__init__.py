@@ -18,4 +18,4 @@ if not path.exists(TILES_DIR):
     makedirs(TILES_DIR)
         
 
-__version__ = "0.1"
+__version__ = "0.2"
