@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 - Accepts content-type charset definitions (#17)
+- X and Y are swapped in downloader (#20)
 
 ### Changed
 -

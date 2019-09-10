@@ -18,7 +18,7 @@ if sys.version_info <= (3, 5):
 
 setup(
     name='openelevationservice',
-    version='0.2',
+    version='0.2.1',
     description='Flask app to serve elevation data to GeoJSON queries.',
     long_description=readme(),
     classifiers=[
