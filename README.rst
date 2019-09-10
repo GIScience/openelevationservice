@@ -127,13 +127,13 @@ Then you can set up the environment:
    # or
    conda create -n oes python=3.6
 
-   # Install required packages
-   pip install -r requirements.txt
+   # Activate virtual env (or equivalent conda command)
+   source .venv/bin/activate
    # Add FLASK_APP environment variable
    # For conda, see here: https://conda.io/docs/user-guide/tasks/manage-environments.html#macos-and-linux
    echo "export FLASK_APP=manage" >> .venv/bin/activate
-   # Activate virtual env (or equivalent conda command)
-   source .venv/bin/activate
+   # Install required packages
+   pip install -r requirements.txt
 
 When your environment is set up, you can run the import process and start the server:
 
