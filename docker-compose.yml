@@ -8,3 +8,6 @@ services:
   ports:
    - "5020:5000"
   mem_limit: 28g
+ joerd_docker:
+  build:
+   context: ./joerd_docker
