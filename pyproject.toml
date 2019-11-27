@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "openelevationservice"
+version = "0.2.1"
+description = "Flask app to serve elevation data to GeoJSON queries."
+authors = ["Nils Nolde <nils.nolde@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/GIScience/openelevationservice"
+readme = "README.rst"
+keywords = ["flask", "elevation", "GIS", "GeoJSON,", "ORS"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+beautifulsoup4 = "^4.8"
+GeoAlchemy2 = "^0.6.3"
+geojson = "^2.5"
+shapely = "^1.6"
+sqlalchemy = "^1.3"
+werkzeug = "^0.16.0"
+pyyaml = "^5.1"
+flasgger = "^0.9.3"
+gunicorn = "^19.9"
+gevent = "^1.4"
+requests = "^2.22"
+psycopg2 = "^2.8"
+Flask = "^1.1"
+Flask_Cors = "^3.0"
+Flask-SQLAlchemy = "^2.4"
+numpy = "^1.17"
+pyqtree = "^1.0"
+geographiclib = "^1.50"
+boto3 = "^1.10"
+contextlib2 = "^0.6.0"
+Cerberus = "^1.3.1"
+
+[tool.poetry.dev-dependencies]
+#python = ""
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

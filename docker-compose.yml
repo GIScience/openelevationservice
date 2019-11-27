@@ -1,13 +1,11 @@
 version: '2.2'
 services:
  gunicorn_flask:
-  #network_mode: "host"
+  network_mode: "host"
   build: .
   volumes:
-  - ./tiles:/deploy/app/tiles
+   - ./tiles:/deploy/app/tiles
+   - ./ops_settings_docker.yml:/deploy/app/openelevationservice/server/ops_settings.yml:rw
   ports:
    - "5020:5000"
   mem_limit: 28g
- joerd_docker:
-  build:
-   context: ./joerd_docker

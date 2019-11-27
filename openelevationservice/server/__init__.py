@@ -37,7 +37,8 @@ def create_app(script_info=None):
     log.info("Following provider parameters are active:\n"
               "Host:\t{host}\n"
               "DB:\t{db_name}\n"
-              "Table:\t{table_name}\n"
+              "Table1:\t{table_name_srtm}\n"
+              "Table2:\t{table_name_composite}\n"
               "User:\t{user_name}".format(**provider_details))
 
     # register blueprints

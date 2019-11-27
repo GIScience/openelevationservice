@@ -6,15 +6,13 @@ from openelevationservice.server.config import SETTINGS
 from openelevationservice.server.db_import.models import db
 from openelevationservice.server.db_import import filestreams
 
-import click
-
 log = get_logger(__name__)
 
 app = create_app()
 
+
 @app.cli.command()
-@click.option('--xyrange', default='0,73,0,25')
-def download(xyrange):
+def download():
     """
     Downloads SRTM tiles to disk. Can be specified over minx, maxx, miny, maxy.
     
@@ -22,8 +20,8 @@ def download(xyrange):
         in that order. For reference grid, see http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp
     :type xyrange: comma-separated integers
     """
-    
-    filestreams.downloadsrtm(_arg_format(xyrange))
+
+    filestreams.downloadsrtm()
     log.info("Downloaded all files")
     
 
@@ -32,7 +30,8 @@ def create():
     """Creates all tables defined in models.py"""
     
     db.create_all()
-    log.info("Table {} was created.".format(SETTINGS['provider_parameters']['table_name']))
+    log.info("Table {} was created.".format(SETTINGS['provider_parameters']['table_name_srtm']))
+    log.info("Table {} was created.".format(SETTINGS['provider_parameters']['table_name_composite']))
     
     
 @app.cli.command()
@@ -40,8 +39,8 @@ def drop():
     """Drops all tables defined in models.py"""
     
     db.drop_all()
-    log.info("Table {} was dropped.".format(SETTINGS['provider_parameters']['table_name']))
-    
+    log.info("Table {} was created.".format(SETTINGS['provider_parameters']['table_name_srtm']))
+    log.info("Table {} was created.".format(SETTINGS['provider_parameters']['table_name_composite']))
 
 @app.cli.command()
 def importdata(): 
