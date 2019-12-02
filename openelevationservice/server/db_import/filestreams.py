@@ -25,8 +25,8 @@ def downloadsrtm():
 
         # merge and clip raster by extent
         log.info("Starting tile processing ...")
-        raster_processing.merge_raster('srtm_*', '/srtm_merged.tif')
-        raster_processing.clip_raster('/srtm_merged.tif', '/srtm_final.tif')
+        merged_filename = raster_processing.merge_raster('srtm_*', 'srtm_merged.tif')
+        raster_processing.clip_raster(merged_filename, '/srtm_final.tif')
 
     elif extent_settings['max_y'] > 60 >= extent_settings['min_y']:
 
@@ -38,15 +38,15 @@ def downloadsrtm():
 
         # resample and merge tiles
         log.info("Starting tile preprocessing ...")
-        raster_processing.merge_raster('srtm_*', '/srtm_merged.tif')
-        raster_processing.clip_raster('/srtm_merged.tif', '/srtm_clipped.tif')
-        raster_processing.merge_raster('*_gmted_mea075.tif', '/gmted_merged.tif')
+        srtm_merged_filename = raster_processing.merge_raster('srtm_*', 'srtm_merged.tif')
+        raster_processing.clip_raster(srtm_merged_filename, 'srtm_clipped.tif')
+        gmted_merged_filename = raster_processing.merge_raster('*_gmted_mea075.tif', 'gmted_merged.tif')
 
         log.info("Starting tile resampling ...")
-        raster_processing.gmted_resampling()
+        raster_processing.gmted_resampling(gmted_merged_filename, 'srtm_clipped.tif', 'gmted_resampled.tif')
 
         log.info("Starting tile merging ...")
-        raster_processing.merge_raster('gmted_resampled.tif', '/raster_final.tif', '/srtm_clipped.tif')
+        raster_processing.merge_raster('gmted_resampled.tif', 'raster_final.tif', 'srtm_clipped.tif')
 
     else:
 
@@ -56,8 +56,8 @@ def downloadsrtm():
 
         # merge and clip raster by extent
         log.info("Starting tile processing ...")
-        raster_processing.merge_raster('*_gmted_mea075.tif', '/gmted_merged.tif')
-        raster_processing.clip_raster('/gmted_merged.tif', '/gmted_final.tif')
+        merged_filename = raster_processing.merge_raster('*_gmted_mea075.tif', 'gmted_merged.tif')
+        raster_processing.clip_raster(merged_filename, 'gmted_final.tif')
 
 
 def raster2pgsql():

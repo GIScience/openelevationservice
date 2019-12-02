@@ -68,7 +68,9 @@ def srtm_y_value(y_min, y_max):
             else:
                 lon_min -= 5
                 lon_max -= 5
-                y_srtm_value -= 1
+                y_srtm_value += 1
+
+        return y_value_list
 
 
 def download_srtm():
