@@ -12,6 +12,7 @@ import time
 
 log = logger.get_logger(__name__)
 
+
 def create_app(script_info=None):
     # instantiate the app
     
@@ -37,8 +38,8 @@ def create_app(script_info=None):
     log.info("Following provider parameters are active:\n"
               "Host:\t{host}\n"
               "DB:\t{db_name}\n"
-              "Table1:\t{table_name_srtm}\n"
-              "Table2:\t{table_name_composite}\n"
+              "Table1:\t{table_name_terrestrial}\n"
+              "Table2:\t{table_name_bathymetry}\n"
               "User:\t{user_name}".format(**provider_details))
 
     # register blueprints

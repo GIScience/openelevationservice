@@ -76,7 +76,7 @@ def clip_raster(merged_filename_extent, output_filename):
         merged_file = path.join(TILES_DIR + '/' + merged_filename)
         merged_data = gdal.Open(merged_file, gdalconst.GA_ReadOnly)
 
-        extent = str(list(SETTINGS['tables'][0]['srtm']['extent'].values()))[1:-1]
+        extent = str(list(SETTINGS['tables']['terrestrial']['extent'].values()))[1:-1]
 
         clip = r"/usr/bin/gdalwarp -t_srs {target_spatial_ref} -dstnodata -9999 -te {extent} -of {outfile_format} {input_file} {out_clipped_file}"
 
@@ -110,7 +110,7 @@ def gmted_resampling(gmted_merged, srtm_clipped, output_filename):
         x_res = reference_data.GetGeoTransform()[1]
         y_res = reference_data.GetGeoTransform()[5]
 
-        extent = str(list(SETTINGS['tables'][0]['srtm']['extent'].values()))[1:-1]
+        extent = str(list(SETTINGS['tables']['terrestrial']['extent'].values()))[1:-1]
 
         # TODO: need extent?
         resampling = r"/usr/bin/gdalwarp -t_srs {target_spatial_ref} -dstnodata -9999 -te {extent} -tr {x_res} {y_res} -r {resampling_method} -of {outfile_format} {input_file} {out_resampling_file}"

@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from openelevationservice import TILES_DIR, SETTINGS
+from openelevationservice.server.sources import PROVIDER_MAPPING
 from openelevationservice.server.utils.logger import get_logger
-from openelevationservice.server.sources.gmted import GMTED
-from openelevationservice.server.sources import srtm
-from openelevationservice.server.db_import import raster_processing
+# from openelevationservice.server.db_import import raster_processing
 
 from os import path, environ
 import subprocess
@@ -12,52 +11,64 @@ import subprocess
 log = get_logger(__name__)
 
 
-def downloadsrtm():
+def download():
     """
     Downlaods GMTED and SRTM v4.1 tiles as bytestream and saves them to TILES_DIR.
     """
 
-    extent_settings = SETTINGS['tables'][0]['srtm']['extent']
+    # for table in SETTINGS['tables']:
+
+    # TODO: write Exception
+    extent_settings = SETTINGS['tables']['terrestrial']['extent']
     if extent_settings['max_y'] <= 60:
 
         # only SRTM data download
-        srtm.download_srtm()
+        provider = PROVIDER_MAPPING['srtm']()
+        try:
+            provider.download_data()
+        except Exception as err:
+            log.info(err)
 
-        # merge and clip raster by extent
-        log.info("Starting tile processing ...")
-        merged_filename = raster_processing.merge_raster('srtm_*', 'srtm_merged.tif')
-        raster_processing.clip_raster(merged_filename, '/srtm_final.tif')
+        # # merge and clip raster by extent
+        # log.info("Starting tile processing ...")
+        # merged_filename = raster_processing.merge_raster('srtm_*', 'srtm_merged.tif')
+        # raster_processing.clip_raster(merged_filename, '/srtm_final.tif')
 
     elif extent_settings['max_y'] > 60 >= extent_settings['min_y']:
 
         # SRTM and GMTED data download
-        srtm.download_srtm()
+        for source in SETTINGS['tables']['terrestrial']['sources']:
+            provider = PROVIDER_MAPPING[source]()
+            try:
+                provider.download_data()
+            except Exception as err:
+                log.info(err)
 
-        tiles_list = GMTED().tile_selection()
-        GMTED().download_gmted(tiles_list)
-
-        # resample and merge tiles
-        log.info("Starting tile preprocessing ...")
-        srtm_merged_filename = raster_processing.merge_raster('srtm_*', 'srtm_merged.tif')
-        raster_processing.clip_raster(srtm_merged_filename, 'srtm_clipped.tif')
-        gmted_merged_filename = raster_processing.merge_raster('*_gmted_mea075.tif', 'gmted_merged.tif')
-
-        log.info("Starting tile resampling ...")
-        raster_processing.gmted_resampling(gmted_merged_filename, 'srtm_clipped.tif', 'gmted_resampled.tif')
-
-        log.info("Starting tile merging ...")
-        raster_processing.merge_raster('gmted_resampled.tif', 'raster_final.tif', 'srtm_clipped.tif')
+        # # resample and merge tiles
+        # log.info("Starting tile preprocessing ...")
+        # srtm_merged_filename = raster_processing.merge_raster('srtm_*', 'srtm_merged.tif')
+        # raster_processing.clip_raster(srtm_merged_filename, 'srtm_clipped.tif')
+        # gmted_merged_filename = raster_processing.merge_raster('*_gmted_mea075.tif', 'gmted_merged.tif')
+        #
+        # log.info("Starting tile resampling ...")
+        # raster_processing.gmted_resampling(gmted_merged_filename, 'srtm_clipped.tif', 'gmted_resampled.tif')
+        #
+        # log.info("Starting tile merging ...")
+        # raster_processing.merge_raster('gmted_resampled.tif', 'raster_final.tif', 'srtm_clipped.tif')
 
     else:
 
         # only GMTED data download
-        tiles_list = GMTED().tile_selection()
-        GMTED().download_gmted(tiles_list)
+        provider = PROVIDER_MAPPING['gmted']()
+        try:
+            provider.download_data()
+        except Exception as err:
+            log.info(err)
 
-        # merge and clip raster by extent
-        log.info("Starting tile processing ...")
-        merged_filename = raster_processing.merge_raster('*_gmted_mea075.tif', 'gmted_merged.tif')
-        raster_processing.clip_raster(merged_filename, 'gmted_final.tif')
+        # # merge and clip raster by extent
+        # log.info("Starting tile processing ...")
+        # merged_filename = raster_processing.merge_raster('*_gmted_mea075.tif', 'gmted_merged.tif')
+        # raster_processing.clip_raster(merged_filename, 'gmted_final.tif')
 
 
 def raster2pgsql():

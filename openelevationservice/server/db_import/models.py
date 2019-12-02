@@ -10,14 +10,14 @@ from geoalchemy2 import Raster
 db = SQLAlchemy()
 
 log = logger.get_logger(__name__)
-table_name_srtm = SETTINGS['provider_parameters']['table_name_srtm']
-table_name_composite = SETTINGS['provider_parameters']['table_name_composite']
+table_name_terrestrial = SETTINGS['provider_parameters']['table_name_terrestrial']
+table_name_bathymetry = SETTINGS['provider_parameters']['table_name_bathymetry']
 
 
 class Cgiar(db.Model):
     """Database model for SRTM v4.1 aka CGIAR dataset."""
 
-    __tablename__ = table_name_srtm
+    __tablename__ = table_name_terrestrial
 
     rid = db.Column(db.Integer, primary_key=True)
     rast = db.Column(Raster)
@@ -29,7 +29,7 @@ class Cgiar(db.Model):
 class Joerd(db.Model):
     """Database model for SRTM v4.1 aka CGIAR dataset."""
 
-    __tablename__ = table_name_composite
+    __tablename__ = table_name_bathymetry
 
     rid = db.Column(db.Integer, primary_key=True)
     rast = db.Column(Raster)

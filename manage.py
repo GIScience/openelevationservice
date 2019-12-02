@@ -21,7 +21,7 @@ def download():
     :type xyrange: comma-separated integers
     """
 
-    filestreams.downloadsrtm()
+    filestreams.download()
     log.info("Downloaded all files")
     
 

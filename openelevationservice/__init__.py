@@ -9,10 +9,8 @@ SETTINGS = safe_load(open(path.join(basedir, 'server', 'ops_settings.yml')))
 TILES_DIR = path.join(getcwd(), 'tiles')
 
 if "TESTING" in environ:
-    SETTINGS['provider_parameters']['table_name_srtm'] = SETTINGS['provider_parameters']['table_name_srtm'] + '_test'
+    SETTINGS['provider_parameters']['table_name_terrestrial'] = SETTINGS['provider_parameters']['table_name_terrestrial'] + '_test'
     TILES_DIR = path.join(basedir, 'tests', 'tile')
-    # if "CI" in environ:
-    #     SETTINGS['provider_parameters']['port'] = 5433
 
 if not path.exists(TILES_DIR):
     makedirs(TILES_DIR)
