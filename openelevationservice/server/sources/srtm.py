@@ -26,52 +26,54 @@ class Srtm(ProviderBase):
 
     def download_data(self):
 
-        x_list = self.srtm_x_value(self.bbox_extent['min_x'], self.bbox_extent['max_x'])
-        y_list = self.srtm_y_value(self.bbox_extent['min_y'], self.bbox_extent['max_y'])
+        if self.bbox_extent['min_y'] <= 60:
 
-        xy_range = [[int(x_list[0]), int(x_list[-1] + 1)],
-                    [int(y_list[0]), int(y_list[-1] + 1)]]
+            x_list = self.srtm_x_value(self.bbox_extent['min_x'], self.bbox_extent['max_x'])
+            y_list = self.srtm_y_value(self.bbox_extent['min_y'], self.bbox_extent['max_y'])
 
-        # Create session for authentication
-        session = requests.Session()
+            xy_range = [[int(x_list[0]), int(x_list[-1] + 1)],
+                        [int(y_list[0]), int(y_list[-1] + 1)]]
 
-        pw = environ.get('SRTMPASS')
-        user = environ.get('SRTMUSER')
-        if not user and not pw:
-            auth = tuple(self.auth_parameters.values())
-        else:
-            auth = tuple([user, pw])
-        session.auth = auth
+            # Create session for authentication
+            session = requests.Session()
 
-        log.debug("SRTM credentials: {}".format(session.auth))
+            pw = environ.get('SRTMPASS')
+            user = environ.get('SRTMUSER')
+            if not user and not pw:
+                auth = tuple(self.auth_parameters.values())
+            else:
+                auth = tuple([user, pw])
+            session.auth = auth
 
-        response = session.get(self.base_url)
+            log.debug("SRTM credentials: {}".format(session.auth))
 
-        soup = BeautifulSoup(response.content, features="html.parser")
+            response = session.get(self.base_url)
 
-        # First find all 'a' tags starting href with srtm*
-        for link in soup.find_all('a', attrs={'href': lambda x: x.startswith('srtm') and x.endswith('.zip')}):
-            link_parsed = link.text.split('_')
-            link_x = int(link_parsed[1])
-            link_y = int(link_parsed[2].split('.')[0])
-            # Check if referenced geotif link is in xy_range
-            if link_y in range(*xy_range[1]) and link_x in range(*xy_range[0]):
-                log.info('yep')
-                # Then load the zip data in memory
-                if not path.exists(path.join(TILES_DIR, '_'.join(['srtm', str(link_x), str(link_y)]) + '.tif')):
-                    with zipfile.ZipFile(BytesIO(session.get(self.base_url + link.text).content)) as zip_obj:
-                        # Loop through the files in the zip
-                        for filename in zip_obj.namelist():
-                            # Don't extract the readme.txt
-                            # if filename != 'readme.txt':
-                            if filename.endswith('.tif'):
-                                data = zip_obj.read(filename)
-                                # Write byte contents to file
-                                with open(path.join(TILES_DIR, filename), 'wb') as f:
-                                    f.write(data)
-                    log.debug("Downloaded file {} to {}".format(link.text, TILES_DIR))
-                else:
-                    log.debug("File {} already exists in {}".format(link.text, TILES_DIR))
+            soup = BeautifulSoup(response.content, features="html.parser")
+
+            # First find all 'a' tags starting href with srtm*
+            for link in soup.find_all('a', attrs={'href': lambda x: x.startswith('srtm') and x.endswith('.zip')}):
+                link_parsed = link.text.split('_')
+                link_x = int(link_parsed[1])
+                link_y = int(link_parsed[2].split('.')[0])
+                # Check if referenced geotif link is in xy_range
+                if link_y in range(*xy_range[1]) and link_x in range(*xy_range[0]):
+                    log.info('yep')
+                    # Then load the zip data in memory
+                    if not path.exists(path.join(TILES_DIR, '_'.join(['srtm', str(link_x), str(link_y)]) + '.tif')):
+                        with zipfile.ZipFile(BytesIO(session.get(self.base_url + link.text).content)) as zip_obj:
+                            # Loop through the files in the zip
+                            for filename in zip_obj.namelist():
+                                # Don't extract the readme.txt
+                                # if filename != 'readme.txt':
+                                if filename.endswith('.tif'):
+                                    data = zip_obj.read(filename)
+                                    # Write byte contents to file
+                                    with open(path.join(TILES_DIR, filename), 'wb') as f:
+                                        f.write(data)
+                        log.debug("Downloaded file {} to {}".format(link.text, TILES_DIR))
+                    else:
+                        log.debug("File {} already exists in {}".format(link.text, TILES_DIR))
 
     @staticmethod
     def srtm_x_value(x_min, x_max):

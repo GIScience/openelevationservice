@@ -23,17 +23,18 @@ class Gmted(ProviderBase):
     def download_data(self):
         """ Download tiles and save to disk. """
 
-        tiles_list = self.tile_selection()
+        if self.bbox_extent['max_y'] > 60:
+            tiles_list = self.tile_selection()
 
-        log.info("{} GMTED tile(s) will be downloaded.".format(len(tiles_list)))
-        for tile in tiles_list:
-            if not path.exists(path.join(TILES_DIR, tile[0])):
-                with open(path.join(TILES_DIR, tile[0]), 'wb') as f:
-                    log.info("Starting to download {}".format(tile[0]))
-                    f.write(requests.get(tile[1]).content)
-                log.info("Downloaded file {} to {}".format(tile[0], TILES_DIR))
-            else:
-                log.info("{} already exists in {}".format(tile[0], TILES_DIR))
+            log.info("{} GMTED tile(s) will be downloaded.".format(len(tiles_list)))
+            for tile in tiles_list:
+                if not path.exists(path.join(TILES_DIR, tile[0])):
+                    with open(path.join(TILES_DIR, tile[0]), 'wb') as f:
+                        log.info("Starting to download {}".format(tile[0]))
+                        f.write(requests.get(tile[1]).content)
+                    log.info("Downloaded file {} to {}".format(tile[0], TILES_DIR))
+                else:
+                    log.info("{} already exists in {}".format(tile[0], TILES_DIR))
 
     @staticmethod
     def intersects(buffered_bbox, bbox):
