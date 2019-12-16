@@ -2,6 +2,7 @@
 
 from openelevationservice import SETTINGS
 
+
 class BaseConfig(object):
     """Base configuration."""
 

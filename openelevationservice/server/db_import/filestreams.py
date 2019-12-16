@@ -3,26 +3,92 @@
 from openelevationservice import TILES_DIR, SETTINGS
 from openelevationservice.server.sources import PROVIDER_MAPPING
 from openelevationservice.server.utils.logger import get_logger
-# from openelevationservice.server.db_import import raster_processing
 
 from os import path, environ
 import subprocess
 
 log = get_logger(__name__)
 
+# TODO: write Exception
+
 
 def download():
-    """
-    Downlaods GMTED and SRTM v4.1 tiles as bytestream and saves them to TILES_DIR.
-    """
+    """Selects download provider."""
 
-    for table in SETTINGS['tables']:
-        for source in SETTINGS['tables'][table]['sources']:
-            provider = PROVIDER_MAPPING[source]()
+    extent_settings = SETTINGS['tables']['terrestrial']['extent']
+    download_list = []
+
+    if not SETTINGS['provider_parameters']['tables']:
+        log.error("Please define at least one table in ops_settings.yml")
+
+    else:
+        # for table in SETTINGS['provider_parameters']['tables']:
+        if 'terrestrial' in SETTINGS['provider_parameters']['tables']:
+
+            # only SRTM data download
+            if 60 >= extent_settings['max_y'] >= -60:
+                provider = PROVIDER_MAPPING['terrestrial']['srtm']()
+                download_list.append(provider)
+
+            # SRTM and GMTED data download
+            elif extent_settings['max_y'] > 60 >= extent_settings['min_y'] or \
+                    extent_settings['max_y'] > -60 >= extent_settings['min_y']:
+                for source in SETTINGS['tables']['terrestrial']['sources']:
+                    provider = PROVIDER_MAPPING['terrestrial'][source]()
+                    download_list.append(provider)
+
+            # only GMTED data download
+            else:
+                provider = PROVIDER_MAPPING['terrestrial']['gmted']()
+                download_list.append(provider)
+
+        else:
+            for p in PROVIDER_MAPPING:
+                if p != 'terrestrial':
+                    provider = PROVIDER_MAPPING[p]()
+                    download_list.append(provider)
+
+        for download_provider in download_list:
             try:
-                provider.download_data()
+                download_provider.download_data()
             except Exception as err:
-                log.info(err)
+                log.error(err)
+
+
+def merge_data():
+    """Selects provider for further raster tile resampling and merging."""
+
+    extent_settings = SETTINGS['tables']['terrestrial']['extent']
+    merge_list = []
+
+    if not SETTINGS['provider_parameters']['tables']:
+        log.error("Please define at least one table in ops_settings.yml")
+
+    else:
+        for table in SETTINGS['provider_parameters']['tables']:
+            if 'terrestrial' in table:
+
+                # only SRTM data
+                if 60 >= extent_settings['max_y'] >= -60:
+                    provider = PROVIDER_MAPPING['terrestrial']['srtm']()
+                    merge_list.append(provider)
+
+                # GMTED data or GMTED and SRTM data
+                elif extent_settings['max_y'] > 60 or extent_settings['min_y'] < -60:
+                    provider = PROVIDER_MAPPING['terrestrial']['gmted']()
+                    merge_list.append(provider)
+
+            else:
+                for p in PROVIDER_MAPPING:
+                    if p != 'terrestrial':
+                        provider = PROVIDER_MAPPING[p]()
+                        merge_list.append(provider)
+
+        for merge_provider in merge_list:
+            try:
+                merge_provider.merge_tiles()
+            except Exception as err:
+                log.error(err)
 
 
 def raster2pgsql():
@@ -32,49 +98,36 @@ def raster2pgsql():
     :raises subprocess.CalledProcessError: Raised when raster2pgsql throws an error.
     """
 
+    # TODO: define -t spatial size
+    # TODO: bathy_raster.tif -> just one row?
+    # TODO: import single files, too?
     pg_settings = SETTINGS['provider_parameters']
 
     # Copy all env variables and add PGPASSWORD
     env_current = environ.copy()
     env_current['PGPASSWORD'] = pg_settings['password']
 
-    tiles_dir_name = None
-
-    if SETTINGS["sources"][0]["type"] == "cgiar_csi":
+    for table in SETTINGS['provider_parameters']['tables']:
+        filename = path.join(TILES_DIR + '/' + table + '_raster.tif')
 
         # Tried to import every raster individually by user-specified xyrange
         # similar to download(), but raster2pgsql fuck it up somehow.. The PostGIS
         # raster will not be what one would expect. Instead doing a bulk import of all files.
-        cmd_raster2pgsql = r"raster2pgsql -s 4326 -a -C -M -P -t 50x50 {filename} {table_name_srtm} | psql -q -h {host} -p {port} -U {user_name} -d {db_name}"
+        cmd_raster2pgsql = r"raster2pgsql -s 4326 -a -C -M -t 50x50 {filename} {table_name} | psql -q -h {host} -p {port} -U {user_name} -d {db_name}"
         # -s: raster SRID
         # -a: append to table (assumes it's been create with 'create()')
         # -C: apply all raster Constraints
-        # -P: pad tiles to guarantee all tiles have the same width and height
         # -M: vacuum analyze after import
         # -t: specifies the pixel size of each row. Important to keep low for performance!
 
-        tiles_dir_name = TILES_DIR
+        cmd_raster2pgsql = cmd_raster2pgsql.format(**{'filename': filename, 'table_name': table, **pg_settings})
 
-    else:
-        cmd_raster2pgsql = r"raster2pgsql -s 4326 -a -C -M -P -t 50x50 {filename} {table_name_joerd} | psql -q -h {host} -p {port} -U {user_name} -d {db_name}"
+        proc = subprocess.Popen(cmd_raster2pgsql,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT,
+                                shell=True,
+                                env=env_current)
 
-        tiles_dir_name = TILES_DIR
-
-    if path.join(TILES_DIR, '*.tif'):
-        cmd_raster2pgsql = cmd_raster2pgsql.format(**{'filename': path.join(tiles_dir_name, '*.tif'), **pg_settings})
-    else:
-        cmd_raster2pgsql = cmd_raster2pgsql.format(**{'filename': path.join(tiles_dir_name, '*.img'), **pg_settings})
-
-    proc = subprocess.Popen(cmd_raster2pgsql,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.STDOUT,
-                            shell=True,
-                            env=env_current
-                            )
-
-#    for line in proc.stdout:
-#        log.debug(line.decode())
-#    proc.stdout.close()
-    return_code = proc.wait()
-    if return_code:
-        raise subprocess.CalledProcessError(return_code, cmd_raster2pgsql)
+        return_code = proc.wait()
+        if return_code:
+            raise subprocess.CalledProcessError(return_code, cmd_raster2pgsql)

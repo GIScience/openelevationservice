@@ -12,17 +12,20 @@ app = create_app()
 
 
 @app.cli.command()
-def download():
+def prepare():
     """
     Downloads SRTM tiles to disk. Can be specified over minx, maxx, miny, maxy.
-    
-    :param xyrange: A comma-separated list of x_min, x_max, y_min, y_max
-        in that order. For reference grid, see http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp
-    :type xyrange: comma-separated integers
     """
 
     filestreams.download()
     log.info("Downloaded all files")
+
+
+@app.cli.command()
+def merge():
+
+    filestreams.merge_data()
+    log.info("Merged downloaded files")
     
 
 @app.cli.command()
@@ -30,8 +33,8 @@ def create():
     """Creates all tables defined in models.py"""
     
     db.create_all()
-    log.info("Table {} was created.".format(SETTINGS['provider_parameters']['table_name_srtm']))
-    log.info("Table {} was created.".format(SETTINGS['provider_parameters']['table_name_composite']))
+    for table in SETTINGS['provider_parameters']['tables']:
+        log.info("Table {} was created.".format(table))
     
     
 @app.cli.command()
@@ -39,30 +42,17 @@ def drop():
     """Drops all tables defined in models.py"""
     
     db.drop_all()
-    log.info("Table {} was created.".format(SETTINGS['provider_parameters']['table_name_srtm']))
-    log.info("Table {} was created.".format(SETTINGS['provider_parameters']['table_name_composite']))
+    for table in SETTINGS['provider_parameters']['tables']:
+        log.info("Table {} was dropped.".format(table))
+
 
 @app.cli.command()
 def importdata(): 
     """
     Imports all data found in ./tiles
-    
-    :param xyrange: A comma-separated list of x_min, x_max, y_min, y_max
-        in that order. For reference grid, see http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp
-    :type xyrange: comma-separated integers
     """
     log.info("Starting to import data...")
     
     filestreams.raster2pgsql()
     
     log.info("Imported data successfully!")
-    
-
-def _arg_format(xy_range_txt):
-    
-    str_split = [int(s.strip()) for s in xy_range_txt.split(',')]
-    
-    xy_range = [[str_split[0], str_split[2]],
-                [str_split[1], str_split[3]]]
-    
-    return xy_range
