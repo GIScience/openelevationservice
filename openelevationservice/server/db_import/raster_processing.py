@@ -54,7 +54,7 @@ def merge_raster(input_filename, output_filename, reference=None):
     return output_filename
 
 
-def clip_raster(merged_filename_extent, output_filename):
+def clip_raster(merged_filename_extent, output_filename, extent):
     """ Clip merged raster by defined extent. """
 
     if not path.exists(path.join(TILES_DIR, output_filename)):
@@ -64,7 +64,9 @@ def clip_raster(merged_filename_extent, output_filename):
         merged_data = gdal.Open(merged_file, gdalconst.GA_ReadOnly)
         output_clip = path.join(TILES_DIR + '/' + output_filename)
 
-        extent = str(list(SETTINGS['tables']['terrestrial']['extent'].values()))[1:-1]
+        extent = str(list(extent.values()))[1:-1]
+
+        # extent = str(list(SETTINGS['tables']['terrestrial']['extent'].values()))[1:-1]
 
         cmd = {'extent': extent,
                'outfile_format': 'GTiff',

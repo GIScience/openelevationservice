@@ -11,45 +11,40 @@ db = SQLAlchemy()
 log = logger.get_logger(__name__)
 
 
-class Terrestrial(db.Model):
-    """Database model for SRTM v4.1 aka CGIAR and GMTED dataset."""
+if SETTINGS['provider_parameters']['tables']['terrestrial']:
+    class Terrestrial(db.Model):
+        """Database model for SRTM v4.1 aka CGIAR and GMTED dataset."""
 
-    __tablename__ = list(SETTINGS['provider_parameters']['tables'].keys())[0]
+        __tablename__ = SETTINGS['provider_parameters']['tables']['terrestrial']
 
-    rid = db.Column(db.Integer, primary_key=True)
-    rast = db.Column(Raster)
+        rid = db.Column(db.Integer, primary_key=True)
+        rast = db.Column(Raster)
 
-    def __repr__(self):
-        return '<rid {}, rast {}>'.format(self.rid, self.rast)
+        def __repr__(self):
+            return '<rid {}, rast {}>'.format(self.rid, self.rast)
 
 
-try:
-    # creates more tables if defined in ops_settings.yml
+if SETTINGS['provider_parameters']['tables']['bathymetry']:
     class Bathymetry(db.Model):
         """Database model for Etopo1 dataset."""
 
-        __tablename__ = list(SETTINGS['provider_parameters']['tables'].keys())[1]
+        __tablename__ = SETTINGS['provider_parameters']['tables']['bathymetry']
 
         rid = db.Column(db.Integer, primary_key=True)
         rast = db.Column(Raster)
 
         def __repr__(self):
             return '<rid {}, rast {}>'.format(self.rid, self.rast)
-except:
-    pass
 
 
-try:
-    # creates more tables if defined in ops_settings.yml
+if SETTINGS['provider_parameters']['tables']['at']:
     class At(db.Model):
         """Database model for austrian government dataset."""
 
-        __tablename__ = list(SETTINGS['provider_parameters']['tables'].keys())[2]
+        __tablename__ = SETTINGS['provider_parameters']['tables']['at']
 
         rid = db.Column(db.Integer, primary_key=True)
         rast = db.Column(Raster)
 
         def __repr__(self):
             return '<rid {}, rast {}>'.format(self.rid, self.rast)
-except:
-    pass

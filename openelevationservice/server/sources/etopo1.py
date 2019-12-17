@@ -20,7 +20,7 @@ class Etopo1(ProviderBase):
             self,
             base_url=SETTINGS['tables']['further_sources']['sources']['etopo1']['url'],
             output_raster='bathymetry_raster.tif',
-            bbox_extent=None,
+            bbox_extent=SETTINGS['tables']['further_sources']['extent'],
             auth_parameters=None,
             filename='ETOPO1_Bed_g_geotiff.tif'
     ):
@@ -41,10 +41,9 @@ class Etopo1(ProviderBase):
         else:
             log.debug("{} already exists in {}".format(self.filename, TILES_DIR))
 
-        # if file exists, clip file by extent
-        if data:
-            log.info("Starting tile processing ...")
-            raster_processing.clip_raster(self.filename, self.output_raster)
+        # clip raster tile by defined extent
+        log.info("Starting tile processing ...")
+        raster_processing.clip_raster(self.filename, self.output_raster, self.bbox_extent)
 
     def merge_tiles(self):
         pass

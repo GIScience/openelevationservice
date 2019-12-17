@@ -44,10 +44,9 @@ class Gvat(ProviderBase):
         else:
             log.debug("{} already exists in {}".format(self.filename, TILES_DIR))
 
-        # if file exists, clip file by extent
-        if data:
-            log.info("Starting tile processing ...")
-            raster_processing.clip_raster(self.filename, self.output_raster)
+        # clip raster tile by defined extent
+        log.info("Starting tile processing ...")
+        raster_processing.clip_raster(self.filename, self.output_raster, self.bbox_extent)
 
     def merge_tiles(self):
         pass

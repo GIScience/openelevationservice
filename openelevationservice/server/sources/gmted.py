@@ -42,7 +42,7 @@ class Gmted(ProviderBase):
         # if only one file exists, clip file by extent
         if len(tiles_list) == 1:
             log.info("Starting tile processing ...")
-            raster_processing.clip_raster(tiles_list[0][0], self.output_raster)
+            raster_processing.clip_raster(tiles_list[0][0], self.output_raster, self.bbox_extent)
 
     @staticmethod
     def intersects(buffered_bbox, bbox):
@@ -104,7 +104,7 @@ class Gmted(ProviderBase):
             # resample and merge tiles
             log.info("Starting tile preprocessing ...")
             srtm_merged_filename = raster_processing.merge_raster('srtm_*', 'srtm_merged.tif')
-            raster_processing.clip_raster(srtm_merged_filename, srtm_reference_file)
+            raster_processing.clip_raster(srtm_merged_filename, srtm_reference_file, self.bbox_extent)
             gmted_merged_filename = raster_processing.merge_raster('*_gmted_*.tif', gmted_merged)
 
             log.info("Starting tile resampling ...")
@@ -122,4 +122,4 @@ class Gmted(ProviderBase):
             merged_filename = raster_processing.merge_raster('*_gmted_*.tif', gmted_merged)
 
             log.info("Starting tile merging ...")
-            raster_processing.clip_raster(merged_filename, self.output_raster)
+            raster_processing.clip_raster(merged_filename, self.output_raster, self.bbox_extent)

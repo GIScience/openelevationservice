@@ -79,7 +79,7 @@ class Srtm(ProviderBase):
         # if only one file exists, clip file by extent
         if file_counter == 1:
             log.info("Starting tile processing ...")
-            raster_processing.clip_raster(data, self.output_raster)
+            raster_processing.clip_raster(data, self.output_raster, self.bbox_extent)
 
     @staticmethod
     def srtm_x_value(x_min, x_max):
@@ -139,4 +139,4 @@ class Srtm(ProviderBase):
         merged_filename = raster_processing.merge_raster('srtm_*', 'srtm_merged.tif')
 
         log.info("Starting tile merging ...")
-        raster_processing.clip_raster(merged_filename, self.output_raster)
+        raster_processing.clip_raster(merged_filename, self.output_raster, self.bbox_extent)

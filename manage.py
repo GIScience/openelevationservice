@@ -30,19 +30,21 @@ def merge():
 @app.cli.command()
 def create():
     """Creates all tables defined in models.py"""
-    
+
     db.create_all()
-    for table in SETTINGS['provider_parameters']['tables']:
-        log.info("Table {} was created.".format(table))
-    
+    for table in SETTINGS['provider_parameters']['tables'].items():
+        if table[1]:
+            log.info("Table {} was created.".format(table[1]))
+
     
 @app.cli.command()
 def drop():
     """Drops all tables defined in models.py"""
     
     db.drop_all()
-    for table in SETTINGS['provider_parameters']['tables']:
-        log.info("Table {} was dropped.".format(table))
+    for table in SETTINGS['provider_parameters']['tables'].items():
+        if table[1]:
+            log.info("Table {} was dropped.".format(table[1]))
 
 
 @app.cli.command()
