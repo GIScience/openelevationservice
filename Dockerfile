@@ -44,8 +44,8 @@ RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poet
 ENV PATH "/root/.poetry/bin:/oes_venv/bin:${PATH}"
 
 # install dependencies via poetry
-RUN poetry config settings.virtualenvs.create false
-RUN poetry self:update --preview
+# RUN poetry config settings.virtualenvs.create false
+# RUN poetry self:update --preview
 RUN poetry config virtualenvs.create false
 COPY pyproject.toml poetry.lock README.rst /
 RUN poetry install

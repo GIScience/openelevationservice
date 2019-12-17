@@ -11,15 +11,45 @@ db = SQLAlchemy()
 log = logger.get_logger(__name__)
 
 
-class Cgiar(db.Model):
-    """Database model for SRTM v4.1 aka CGIAR dataset."""
+class Terrestrial(db.Model):
+    """Database model for SRTM v4.1 aka CGIAR and GMTED dataset."""
 
-    for table in SETTINGS['provider_parameters']['tables']:
+    __tablename__ = list(SETTINGS['provider_parameters']['tables'].keys())[0]
 
-        __tablename__ = table
+    rid = db.Column(db.Integer, primary_key=True)
+    rast = db.Column(Raster)
+
+    def __repr__(self):
+        return '<rid {}, rast {}>'.format(self.rid, self.rast)
+
+
+try:
+    # creates more tables if defined in ops_settings.yml
+    class Bathymetry(db.Model):
+        """Database model for Etopo1 dataset."""
+
+        __tablename__ = list(SETTINGS['provider_parameters']['tables'].keys())[1]
 
         rid = db.Column(db.Integer, primary_key=True)
         rast = db.Column(Raster)
 
         def __repr__(self):
             return '<rid {}, rast {}>'.format(self.rid, self.rast)
+except:
+    pass
+
+
+try:
+    # creates more tables if defined in ops_settings.yml
+    class At(db.Model):
+        """Database model for austrian government dataset."""
+
+        __tablename__ = list(SETTINGS['provider_parameters']['tables'].keys())[2]
+
+        rid = db.Column(db.Integer, primary_key=True)
+        rast = db.Column(Raster)
+
+        def __repr__(self):
+            return '<rid {}, rast {}>'.format(self.rid, self.rast)
+except:
+    pass

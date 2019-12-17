@@ -18,7 +18,7 @@ class Etopo1(ProviderBase):
 
     def __init__(
             self,
-            base_url=SETTINGS['tables']['bathymetry']['sources']['etopo1']['url'],
+            base_url=SETTINGS['tables']['further_sources']['sources']['etopo1']['url'],
             output_raster='bathymetry_raster.tif',
             bbox_extent=None,
             auth_parameters=None,
@@ -29,8 +29,6 @@ class Etopo1(ProviderBase):
     def download_data(self):
         """Download tiles and save to disk."""
 
-        file_counter = 0
-
         if not path.exists(path.join(TILES_DIR, self.filename)):
             with zipfile.ZipFile(BytesIO(requests.get(self.base_url).content)) as zip_obj:
                 # Loop through the files in the zip
@@ -39,16 +37,14 @@ class Etopo1(ProviderBase):
                     # Write byte contents to file
                     with open(path.join(TILES_DIR, file), 'wb') as f:
                         f.write(data)
-                        file_counter += 1
             log.debug("Downloaded file {} to {}".format(file, TILES_DIR))
         else:
             log.debug("{} already exists in {}".format(self.filename, TILES_DIR))
 
-        # if only one file exists, clip file by extent
-        if file_counter == 1:
+        # if file exists, clip file by extent
+        if data:
             log.info("Starting tile processing ...")
             raster_processing.clip_raster(self.filename, self.output_raster)
 
     def merge_tiles(self):
-        """Resamples and merges downloaded files to one raster tile."""
         pass

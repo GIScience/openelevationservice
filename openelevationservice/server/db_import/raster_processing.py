@@ -8,8 +8,6 @@ from os import path, listdir
 import fnmatch
 
 
-# TODO: handle in memory files
-
 def run_cmd(cmd):
     proc = subprocess.Popen(cmd,
                             stdout=subprocess.PIPE,

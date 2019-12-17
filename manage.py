@@ -13,9 +13,7 @@ app = create_app()
 
 @app.cli.command()
 def prepare():
-    """
-    Downloads SRTM tiles to disk. Can be specified over minx, maxx, miny, maxy.
-    """
+    """Downloads SRTM tiles to disk. Can be specified over extent values in ops_settings.yml"""
 
     filestreams.download()
     log.info("Downloaded all files")
@@ -23,6 +21,7 @@ def prepare():
 
 @app.cli.command()
 def merge():
+    """Merges downloaded single SRTM and GMTED tiles to one raster"""
 
     filestreams.merge_data()
     log.info("Merged downloaded files")
@@ -48,11 +47,8 @@ def drop():
 
 @app.cli.command()
 def importdata(): 
-    """
-    Imports all data found in ./tiles
-    """
+    """Imports all data found in ./tiles"""
+
     log.info("Starting to import data...")
-    
     filestreams.raster2pgsql()
-    
     log.info("Imported data successfully!")
