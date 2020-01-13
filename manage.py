@@ -49,7 +49,7 @@ def drop():
 
 @app.cli.command()
 def importdata(): 
-    """Imports all data found in ./tiles"""
+    """Imports all '_raster.tif' files found in ./tiles"""
 
     log.info("Starting to import data...")
     filestreams.raster2pgsql()

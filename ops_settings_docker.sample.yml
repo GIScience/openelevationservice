@@ -3,45 +3,47 @@ attribution: "service by https://openrouteservice.org | data by http://srtm.csi.
 coord_precision: 1e-6
 maximum_nodes: 2000
 provider_parameters:
-  table_name_terrestrial: terrestrial
-  table_name_bathymetry: bathymetry
+  tables:
+    terrestrial: t
+    bathymetry: b
+    at:
   db_name: oes_db
-  user_name: postgres
-  password: postgres
+  user_name: gis
+  password: gis
   host: localhost
   port: 5432
 tables:
   terrestrial:
-    table_name: terrestrial
     sources:
       srtm:
         url: http://data.cgiar-csi.org/srtm/tiles/GeoTIFF/
         srtm_parameters:
-          user: data_public
-          password: GDdci
+          user: user
+          password: password
       gmted:
-        url: http://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Global_tiles_GMTED
-        ys: [-90, -70, -50, -30, -10, 10, 30, 50, 70]
-        xs: [-180, -150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150]
+        url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Global_tiles_GMTED
+        xys:
+          ys: [-90, -70, -50, -30, -10, 10, 30, 50, 70]
+          xs: [-180, -150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150]
     extent:
-#        min_x: 8.305664
-#        min_y: 61.653379
-#        max_x: 8.931885
-#        max_y: 61.944118
-      min_x: 8.257599
-      min_y: 49.185294
-      max_x: 8.997803
-      max_y: 49.624056
+      min_x: 8.305664
+      min_y: 61.653379
+      max_x: 8.931885
+      max_y: 61.944118
+#      min_x: 8.257599
+#      min_y: 49.185294t
+#      max_x: 8.997803
+#      max_y: 49.624056
 #      min_x: -1.406250
 #      min_y: 57.088515
 #      max_x: 15.820313
 #      max_y: 64.091408
-
-  bathymetry:
-    table_name: bathymetry
+  further_sources:
     sources:
       etopo1:
-          url: https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/bedrock/grid_registered/georeferenced_tiff/ETOPO1_Bed_g_geotiff.zip
+        url: https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/bedrock/grid_registered/georeferenced_tiff/ETOPO1_Bed_g_geotiff.zip
+      gv_at:
+        url: https://gis.ktn.gv.at/OGD/Geographie_Planung/ogd-10m-at.zip
     extent:
       min_x: 8.662891
       min_y: 49.395223
