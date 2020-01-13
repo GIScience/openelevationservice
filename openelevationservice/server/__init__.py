@@ -12,6 +12,7 @@ import time
 
 log = logger.get_logger(__name__)
 
+
 def create_app(script_info=None):
     # instantiate the app
     
@@ -32,13 +33,15 @@ def create_app(script_info=None):
 
     # set up extensions
     db.init_app(app)
-    
+
     provider_details = SETTINGS['provider_parameters']
-    log.info("Following provider parameters are active:\n"
-              "Host:\t{host}\n"
-              "DB:\t{db_name}\n"
-              "Table:\t{table_name}\n"
-              "User:\t{user_name}".format(**provider_details))
+
+    for table in provider_details['tables']:
+        log.info("Following provider parameters are active:\n"
+                  "Host:\t{host}\n"
+                  "DB:\t{db_name}\n"
+                  "Table:\t{table_name}\n"
+                  "User:\t{user_name}".format(**provider_details, table_name=table))
 
     # register blueprints
     from openelevationservice.server.api.views import main_blueprint

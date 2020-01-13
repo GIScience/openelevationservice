@@ -2,7 +2,8 @@
 
 from openelevationservice import SETTINGS
 from openelevationservice.server.utils.logger import get_logger
-from openelevationservice.server.db_import.models import db, Cgiar
+from openelevationservice.server.db_import.models import db
+from openelevationservice.server.db_import import models
 from openelevationservice.server.utils.custom_func import ST_SnapToGrid
 from openelevationservice.server.api.api_exceptions import InvalidUsage
 
@@ -26,7 +27,13 @@ def _getModel(dataset):
     :rtype: SQLAlchemy model
     """
     if dataset == 'srtm':
-        model = Cgiar
+        model = models.Terrestrial
+
+    elif dataset == 'etopo1':
+        model = models.Bathymetry
+
+    elif dataset == 'gv_at':
+        model = models.At
     
     return model
 

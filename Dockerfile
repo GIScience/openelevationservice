@@ -6,6 +6,9 @@ MAINTAINER Nils Nolde <nils@openrouteservice.org>
 
 RUN apt-get update
 RUN apt-get install -y locales git python3-venv
+RUN apt-get install -y build-essential libssl-dev libffi-dev python3-dev
+RUN apt-get install -y libpq-dev
+RUN apt-get install -y git curl
 
 # Set the locale
 RUN locale-gen en_US.UTF-8
@@ -32,13 +35,24 @@ RUN mkdir -p /deploy/app
 COPY gunicorn_config.py /deploy/gunicorn_config.py
 COPY manage.py /deploy/app/manage.py
 
-COPY requirements.txt /deploy/app/requirements.txt
-
 RUN python3 -m venv /oes_venv
 
 RUN /bin/bash -c "source /oes_venv/bin/activate"
 
-RUN /oes_venv/bin/pip3 install -r /deploy/app/requirements.txt
+# install poetry
+RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python3
+ENV PATH "/root/.poetry/bin:/oes_venv/bin:${PATH}"
+
+# install dependencies via poetry
+# RUN poetry config settings.virtualenvs.create false
+# RUN poetry self:update --preview
+RUN poetry config virtualenvs.create false
+COPY pyproject.toml poetry.lock README.rst /
+RUN poetry install
+
+RUN apt-get install -y python-gdal python-bs4 python-numpy gdal-bin python-setuptools python-shapely
+RUN apt-get install -y libgdal-dev python3-dev
+RUN /oes_venv/bin/pip3 install GDAL==$(gdal-config --version) --global-option=build_ext --global-option="-I/usr/include/gdal"
 
 COPY openelevationservice /deploy/app/openelevationservice
 COPY ops_settings_docker.yml /deploy/app/openelevationservice/server/ops_settings.yml
