@@ -23,7 +23,7 @@ class ProductionConfig(BaseConfig):
 class DevelopmentConfig(BaseConfig):
     """Production configuration."""
 
-    SQLALCHEMY_DATABASE_URI = 'postgresql://gis:gis@localhost:5432/gis'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://{user_name}:{password}@{host}:{port}/{db_name}'.format(**SETTINGS['provider_parameters'])
     DEBUG_TB_ENABLED = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 

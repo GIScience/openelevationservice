@@ -67,3 +67,6 @@ def _arg_format(xy_range_txt):
                 [str_split[1], str_split[3]]]
     
     return xy_range
+
+if __name__ == '__main__':
+    app.cli()

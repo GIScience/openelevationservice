@@ -18,9 +18,9 @@ log = get_logger(__name__)
 
 def downloadsrtm(xy_range):
     """
-    Downlaods SRTM v4.1 tiles as bytestream and saves them to TILES_DIR.
+    Downlaods SRTM v4.1 tiles2 as bytestream and saves them to TILES_DIR.
     
-    :param xy_range: The range of tiles in x and y as per grid in 
+    :param xy_range: The range of tiles2 in x and y as per grid in
         http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp
         in 'minx, maxx, miny, maxy.
     :type xy_range: comma-separated range string
@@ -51,7 +51,7 @@ def downloadsrtm(xy_range):
         link_x = int(link_parsed[1])
         link_y = int(link_parsed[2].split('.')[0])
         # Check if referenced geotif link is in xy_range
-        if link_y in range(*xy_range[0]) and link_x in range(*xy_range[1]):
+        if link_x in range(*xy_range[0]) and link_y in range(*xy_range[1]):
             log.info('yep')
             # Then load the zip data in memory
             if not path.exists(path.join(TILES_DIR, '_'.join(['srtm', str(link_x), str(link_y)]) + '.tif')):

@@ -4,7 +4,7 @@ run_travis.sh
 .venv/
 .spyproject/
 *__pycache__/
-tiles/
+tiles2/
 *.log
 openelevationservice/server/ops_settings.yml
 ops_settings_docker.yml
