@@ -22,7 +22,7 @@ COPY --from=builder /deploy /deploy
 COPY --from=builder /oes_venv /oes_venv
 
 RUN apt-get update \
-    && /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install locales postgis python3-venv tzdata" \
+    && /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install locales postgis postgresql-client python3-venv tzdata" \
     && ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime \
     && dpkg-reconfigure --frontend noninteractive tzdata \
     && locale-gen en_US.UTF-8 \
