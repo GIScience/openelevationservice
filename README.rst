@@ -148,7 +148,31 @@ When your environment is set up, you can run the import process and start the se
    # Start the server
    flask run
 
-The service will now listen on ```http://localhost:5000``.
+The service will now listen on ``http://localhost:5000``.
+
+
+Windows with remote PostGIS set up
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Rename ``./openelevationservice/server/ops_settings.sample.yml`` to ``ops_settings.yml``.
+
+Only the part of ``provider_parameters`` needs to be changed, write the connection properties to the remote database server.
+
+.. code-block:: bash
+  # Python virtual environment setup and activate
+  python -m venv .venv
+  cd .\.venv\Scripts
+  activate
+  cd ..\..
+
+  # Install required packages
+  # If a sequence of errors occurs, in "requirements.txt", replace the last line:
+  # - "psycopg2-binary==2.8.4" by "psycopg2-binary>=2.8.4"
+  pip install -r requirements.txt
+
+  # Run the server
+  flask --app manage run
+
 
 Endpoints
 ----------------------------------------------------------
