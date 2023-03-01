@@ -154,9 +154,11 @@ The service will now listen on ``http://localhost:5000``.
 Windows with remote PostGIS set up
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Rename ``./openelevationservice/server/ops_settings.sample.yml`` to ``ops_settings.yml``.
+Rename ``./openelevationservice/server/ops_settings.sample.yml`` to ``ops_settings.yml``:
 
-Only the part of ``provider_parameters`` needs to be changed, write the connection properties to the remote database server.
+- Set ``coord_precision`` to ``0.000833333333``.
+- The part of ``srtm_parameters`` need not be changed.
+- For part of ``provider_parameters``, write the connection properties to the remote database server.
 
 Steps to establish the environment and run the server:
 
