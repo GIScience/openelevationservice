@@ -161,6 +161,7 @@ Only the part of ``provider_parameters`` needs to be changed, write the connecti
 Steps to establish the environment and run the server:
 
 .. code-block:: bash
+
    # Python virtual environment setup and activate
    python -m venv .venv
    cd .\.venv\Scripts
@@ -174,7 +175,6 @@ Steps to establish the environment and run the server:
  
    # Run the server
    flask --app manage run
-
 
 Endpoints
 ----------------------------------------------------------
