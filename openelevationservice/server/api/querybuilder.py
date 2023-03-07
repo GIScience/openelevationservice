@@ -13,7 +13,10 @@ import json
 log = get_logger(__name__)
 
 coord_precision = SETTINGS['coord_precision']
-
+if "/" in coord_precision:
+    coord_precision = float(coord_precision.split("/")[0]) / float(coord_precision.split("/")[1])
+else:
+    coord_precision = float(coord_precision)
 
 def _getModel(dataset):
     """
@@ -29,6 +32,66 @@ def _getModel(dataset):
         model = Cgiar
     
     return model
+
+
+def polygon_elevation(geometry, format_out, dataset):
+    """
+    Performs PostGIS query to enrich a polygon geometry.
+    
+    :param geometry: Input 2D polygon to be enriched with elevation
+    :type geometry: Shapely geometry
+    
+    :param format_out: Specifies output format. One of ['geojson', 'polygon']
+    :type format_out: string
+    
+    :param dataset: Elevation dataset to use for querying
+    :type dataset: string
+    
+    :raises InvalidUsage: internal HTTP 500 error with more detailed description. 
+        
+    :returns: 3D polygon as GeoJSON or WKT
+    :rtype: string
+    """
+    
+    Model = _getModel(dataset)
+    
+    if geometry.geom_type == 'Polygon':
+        query_points2d = db.session\
+                            .query(func.ST_SetSRID(ST_DumpPoints(geometry.wkt).geom, 4326) \
+                            .label('geom')) \
+                            .subquery().alias('points2d')
+
+        query_getelev = db.session \
+                            .query(query_points2d.c.geom,
+                                   ST_Value(Model.rast, query_points2d.c.geom).label('z')) \
+                            .filter(ST_Intersects(Model.rast, query_points2d.c.geom)) \
+                            .subquery().alias('getelevation')
+
+        query_points3d = db.session \
+                            .query(func.ST_SetSRID(func.ST_MakePoint(ST_X(query_getelev.c.geom),
+                                                                     ST_Y(query_getelev.c.geom),
+                                                                     query_getelev.c.z),
+                                              4326).label('geom')) \
+                            .subquery().alias('points3d')
+
+        if format_out == 'geojson':
+            # Return GeoJSON directly in PostGIS
+            query_final = db.session \
+                              .query(func.ST_AsGeoJson(func.ST_MakePolygon(ST_SnapToGrid(query_points3d.c.geom, coord_precision))))
+            
+        else:
+            # Else return the WKT of the geometry
+            query_final = db.session \
+                              .query(func.ST_AsText(func.ST_MakePolygon(ST_SnapToGrid(query_points3d.c.geom, coord_precision))))
+    else:
+        raise InvalidUsage(400, 4002, "Needs to be a Polygon, not a {}!".format(geometry.geom_type))
+
+    # Behaviour when all vertices are out of bounds
+    if query_final[0][0] == None:
+        raise InvalidUsage(404, 4002,
+                           'The requested geometry is outside the bounds of {}'.format(dataset))
+        
+    return query_final[0][0]
 
 
 def line_elevation(geometry, format_out, dataset):
@@ -54,15 +117,34 @@ def line_elevation(geometry, format_out, dataset):
     Model = _getModel(dataset)
     
     if geometry.geom_type == 'LineString':
-        query_points2d = db.session\
-                            .query(func.ST_SetSRID(ST_DumpPoints(geometry.wkt).geom, 4326) \
-                            .label('geom')) \
-                            .subquery().alias('points2d')
+        num_points = db.session \
+                        .query(func.ST_NPoints(geometry.wkt)) \
+                        .scalar()
+        
+        if int(num_points) != 2:
+            raise InvalidUsage(400, 4002, "Actually, only LineString with exactly 2 points are supported!")
+        
+        lineLen = max(geometry.bounds[2] - geometry.bounds[0], geometry.bounds[3] - geometry.bounds[1])
+
+        query_points2d = db.session \
+                            .query(func.ST_SetSRID(func.ST_DumpPoints(func.ST_Union(
+                                func.ST_PointN(geometry.wkt, 1),
+                                func.ST_LineInterpolatePoints(
+                                    geometry.wkt,
+                                    min(1, coord_precision / lineLen)
+                                )
+                            )).geom, 4326).label('geom')).subquery().alias('points2d')
+        
+        #query_points2d = db.session\
+        #                    .query(func.ST_SetSRID(ST_DumpPoints(geometry.wkt, coord_precision).geom, 4326) \
+        #                    .label('geom')) \
+        #                    .subquery().alias('points2d')
 
         query_getelev = db.session \
-                            .query(query_points2d.c.geom,
+                            .query(func.DISTINCT(query_points2d.c.geom).label('geom'),
                                    ST_Value(Model.rast, query_points2d.c.geom).label('z')) \
-                            .filter(ST_Intersects(Model.rast, query_points2d.c.geom)) \
+                            .select_from(query_points2d) \
+                            .join(Model, ST_Intersects(Model.rast, query_points2d.c.geom)) \
                             .subquery().alias('getelevation')
 
         query_points3d = db.session \
@@ -75,12 +157,12 @@ def line_elevation(geometry, format_out, dataset):
         if format_out == 'geojson':
             # Return GeoJSON directly in PostGIS
             query_final = db.session \
-                              .query(func.ST_AsGeoJson(func.ST_MakeLine(ST_SnapToGrid(query_points3d.c.geom, coord_precision))))
+                              .query(func.ST_AsGeoJson(func.ST_MakeLine(query_points3d.c.geom))) #ST_SnapToGrid(, coord_precision)
             
         else:
             # Else return the WKT of the geometry
             query_final = db.session \
-                              .query(func.ST_AsText(func.ST_MakeLine(ST_SnapToGrid(query_points3d.c.geom, coord_precision))))
+                              .query(func.ST_AsText(func.ST_MakeLine(query_points3d.c.geom))) #ST_SnapToGrid(, coord_precision)
     else:
         raise InvalidUsage(400, 4002, "Needs to be a LineString, not a {}!".format(geometry.geom_type))
 

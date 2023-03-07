@@ -1,6 +1,6 @@
 ---
 attribution: "service by https://openrouteservice.org | data by http://srtm.csi.cgiar.org"
-coord_precision: 1e-6
+coord_precision: 1/1200
 maximum_nodes: 2000
 srtm_parameters:
   user: user

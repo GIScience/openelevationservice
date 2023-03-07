@@ -12,8 +12,8 @@ Validator.types_mapping['object'] = object_type
 v = Validator()
 
 schema_post = {'geometry': {'anyof_type': ['object', 'list', 'string'], 'required': True},
-               'format_in': {'type': 'string', 'allowed': ['geojson', 'point', 'encodedpolyline', 'encodedpolyline5', 'encodedpolyline6', 'polyline'], 'required': True},
-               'format_out': {'type': 'string', 'allowed': ['geojson', 'point', 'encodedpolyline', 'encodedpolyline5', 'encodedpolyline6', 'polyline'], 'default': 'geojson'},
+               'format_in': {'type': 'string', 'allowed': ['geojson', 'point', 'encodedpolyline', 'encodedpolyline5', 'encodedpolyline6', 'polyline', 'polygon'], 'required': True},
+               'format_out': {'type': 'string', 'allowed': ['geojson', 'point', 'encodedpolyline', 'encodedpolyline5', 'encodedpolyline6', 'polyline', 'polygon'], 'default': 'geojson'},
                'dataset': {'type': 'string', 'allowed': ['srtm'], 'default': 'srtm'}
                }
 

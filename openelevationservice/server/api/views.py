@@ -14,6 +14,49 @@ log = logger.get_logger(__name__)
 
 main_blueprint = Blueprint('main', __name__, )
 
+@main_blueprint.route('/elevation/polygon', methods=['POST'])
+def elevationpolygon():
+    # Cerberus validates and returns a processed arg dict
+    req_args = validator.validate_request(request)
+    
+    # Incoming parameters
+    geometry_str = req_args['geometry']
+    format_in = req_args['format_in']
+    format_out = req_args['format_out']
+    dataset = req_args['dataset']
+      
+    # Get the geometry
+    if format_in == 'geojson':
+        geom = convert.geojson_to_geometry(geometry_str)
+    elif format_in == 'polygon':
+        geom = convert.polygon_to_geometry(geometry_str)
+    else:
+        raise api_exceptions.InvalidUsage(400,
+                                          4000,
+                                          f'Invalid format_in value "{format_in}"')
+        
+    #if len(list(geom.coords)) > SETTINGS['maximum_nodes']:
+    #    raise api_exceptions.InvalidUsage(status_code=400,
+    #                                      error_code=4003,
+    #                                      message='Maximum number of nodes exceeded.')
+                
+    results = ResponseBuilder().__dict__
+    geom_queried = querybuilder.polygon_elevation(geom, format_out, dataset)
+    
+    # decision tree for format_out
+    if format_out != 'geojson':
+        geom_out = wkt.loads(geom_queried)
+        coords = geom_out.coords
+        results['geometry'] = list(coords)
+    elif format_out == 'geojson':
+        results['geometry'] = json.loads(geom_queried)
+    else:
+        raise api_exceptions.InvalidUsage(400,
+                                          4000,
+                                          f'Invalid format_out value "{format_out}"')
+    
+    return jsonify(results)
+
 @main_blueprint.route('/elevation/line', methods=['POST'])
 def elevationline():
     """

@@ -3,7 +3,7 @@
 from openelevationservice.server.api.api_exceptions import InvalidUsage
 from openelevationservice.server.utils import logger
 
-from shapely.geometry import shape, LineString, Point
+from shapely.geometry import shape, LineString, Point, Polygon
 
 log = logger.get_logger(__name__)
 
@@ -65,6 +65,15 @@ def polyline_to_geometry(point_list):
     
     try:
         geom = LineString(point_list)
+    except Exception as e:
+        raise InvalidUsage(status_code=400,
+                          error_code=4002,
+                          message=str(e))
+    return geom
+
+def polygon_to_geometry(point_list):
+    try:
+        geom = Polygon(point_list)
     except Exception as e:
         raise InvalidUsage(status_code=400,
                           error_code=4002,
