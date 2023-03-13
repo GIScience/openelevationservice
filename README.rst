@@ -185,12 +185,21 @@ The default base url is ``http://localhost:5000/``.
 
 The openelevationservice exposes 2 endpoints:
 
+- ``/elevation/polygon``: used for Polygon geometries
 - ``/elevation/line``: used for LineString geometries
 - ``/elevation/point``: used for single Point geometries
 
 +-----------------------+-------------------+------------+---------+---------------------------------------------------------+
 |       Endpoint        | Method(s) allowed | Parameter  | Default | Values                                                  |
 +=======================+===================+============+=========+=========================================================+
+| ``/elevation/polygon``| POST              | format_in  |    --   | geojson, polygon                                        |
+|                       |                   +------------+---------+---------------------------------------------------------+
+|                       |                   | geometry   |    --   | depends on ``format_in``                                |
+|                       |                   +------------+---------+---------------------------------------------------------+
+|                       |                   | format_out | geojson | geojson, polygon                                        |
+|                       |                   +------------+---------+---------------------------------------------------------+
+|                       |                   | dataset    | srtm    | srtm (so far)                                           |
++-----------------------+-------------------+------------+---------+---------------------------------------------------------+
 | ``/elevation/line``   | POST              | format_in  |    --   | geojson, polyline, encodedpolyline5, encodedpolyline6   |
 |                       |                   +------------+---------+---------------------------------------------------------+
 |                       |                   | geometry   |    --   | depends on ``format_in``                                |
@@ -295,4 +304,23 @@ POST LineString as polyline
       "format_out": "encodedpolyline",
       "geometry": [[13.349762, 38.11295],
                    [12.638397, 37.645772]]
+    }'
+
+POST Polygon
+#########################################################
+
+.. code-block:: bash
+
+  curl -XPOST http://localhost:5000/elevation/polygon \
+    -H 'Content-Type: application/json' \
+    -d '{
+      "format_in": "polygon",
+      "format_out": "polygon",
+      "geometry": [
+        [75, 29], 
+        [75.003, 29],
+        [75.003, 29.002],
+        [75, 29.002],
+        [75, 29]
+      ]
     }'
