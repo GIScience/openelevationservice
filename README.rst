@@ -184,7 +184,7 @@ For more detailed information, please visit the `API documentation`_.
 
 When hosted locally, visit ``https://localhost:5000/apidocs``.
 
-.. _`API documentation`: https://coming.soon
+.. _`API documentation`: https://openrouteservice.org/dev/#/api-docs/elevation
 
 Environment variables
 ##########################################################
