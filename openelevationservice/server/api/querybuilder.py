@@ -123,6 +123,7 @@ def point_elevation(geometry, format_out, dataset):
                             .query(query_point2d.c.geom,
                                    ST_Value(Model.rast, query_point2d.c.geom).label('z')) \
                             .filter(ST_Intersects(Model.rast, query_point2d.c.geom)) \
+                            .order_by(ST_Value(Model.rast, query_point2d.c.geom).asc()) \
                             .subquery().alias('getelevation')
         
         if format_out == 'geojson': 
