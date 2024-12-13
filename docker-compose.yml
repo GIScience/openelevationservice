@@ -1,10 +1,43 @@
 version: '2.2'
 services:
- gunicorn_flask:
-  #network_mode: "host"
-  build: .
-  volumes:
-  - ./tiles:/deploy/app/tiles
-  ports:
-   - "5020:5000"
-  mem_limit: 28g
+  gunicorn_flask:
+    #network_mode: "host"
+    build: .
+    volumes:
+      - /mnt/data/tiles/:/deploy/app/tiles
+    ports:
+      - "5020:5000"
+    mem_limit: 6g
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - elevation-service-network
+
+  elevation-postgis:
+    image: kartoza/postgis:13-3.1
+    container_name: elevation-postgis-1
+    volumes:
+      - /mnt/data/postgresql/:/var/lib/postgresql
+    environment:
+      - POSTGRES_DB=gis
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=gZwe5Nj
+      - POSTGRES_MULTIPLE_EXTENSIONS=postgis,hstore,postgis_topology,postgis_raster
+      - PASSWORD_AUTHENTICATION=md5
+    ports:
+      - 5432:5432
+    restart: on-failure
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - elevation-service-network
+    
+networks:
+  elevation-service-network:
+    driver: bridge

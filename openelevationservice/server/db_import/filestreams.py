@@ -26,7 +26,7 @@ def downloadsrtm(xy_range):
     :type xy_range: comma-separated range string
     """
     
-    base_url = r'http://data.cgiar-csi.org/srtm/tiles/GeoTIFF/'
+    base_url = r'https://srtm.csi.cgiar.org/wp-content/uploads/files/srtm_5x5/TIFF/'
     
     # Create session for authentication
     session = requests.Session()
