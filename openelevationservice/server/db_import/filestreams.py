@@ -46,27 +46,50 @@ def downloadsrtm(xy_range):
     soup = BeautifulSoup(response.content, features="html.parser")
     
     # First find all 'a' tags starting href with srtm*
-    for link in soup.find_all('a', attrs={'href': lambda x: x.startswith('srtm') and x.endswith('.zip')}):
-        link_parsed = link.text.split('_')
-        link_x = int(link_parsed[1])
-        link_y = int(link_parsed[2].split('.')[0])
-        # Check if referenced geotif link is in xy_range
-        if link_x in range(*xy_range[0]) and link_y in range(*xy_range[1]):
-            log.info('yep')
-            # Then load the zip data in memory
-            if not path.exists(path.join(TILES_DIR, '_'.join(['srtm', str(link_x), str(link_y)]) + '.tif')):
-                with zipfile.ZipFile(BytesIO(session.get(base_url + link.text).content)) as zip_obj:
-                    # Loop through the files in the zip
-                    for filename in zip_obj.namelist():
-                        # Don't extract the readme.txt
-                        if filename != 'readme.txt':
-                            data = zip_obj.read(filename)
-                            # Write byte contents to file
-                            with open(path.join(TILES_DIR, filename), 'wb') as f:
-                                f.write(data)        
-                log.debug("Downloaded file {} to {}".format(link.text, TILES_DIR))
-            else:
-                log.debug("File {} already exists in {}".format(link.text, TILES_DIR))
+    if response.status_code != 403:
+        for link in soup.find_all('a', attrs={'href': lambda x: x.startswith('srtm') and x.endswith('.zip')}):
+            link_parsed = link.text.split('_')
+            link_x = int(link_parsed[1])
+            link_y = int(link_parsed[2].split('.')[0])
+            # Check if referenced geotif link is in xy_range
+            if link_x in range(*xy_range[0]) and link_y in range(*xy_range[1]):
+                log.info('yep')
+                # Then load the zip data in memory
+                if not path.exists(path.join(TILES_DIR, '_'.join(['srtm', str(link_x), str(link_y)]) + '.tif')):
+                    with zipfile.ZipFile(BytesIO(session.get(base_url + link.text).content)) as zip_obj:
+                        # Loop through the files in the zip
+                        for filename in zip_obj.namelist():
+                            # Don't extract the readme.txt
+                            if filename != 'readme.txt':
+                                data = zip_obj.read(filename)
+                                # Write byte contents to file
+                                with open(path.join(TILES_DIR, filename), 'wb') as f:
+                                    f.write(data)        
+                    log.debug("Downloaded file {} to {}".format(link.text, TILES_DIR))
+                else:
+                    log.debug("File {} already exists in {}".format(link.text, TILES_DIR))
+
+    else:
+        for link_x in range(*xy_range[0]):
+            for link_y in range(*xy_range[1]):
+                try:
+                    if not path.exists(path.join(TILES_DIR, '_'.join(['srtm', str(link_x), str(link_y)]) + '.tif')):
+                        with zipfile.ZipFile(BytesIO(session.get(f"{base_url}srtm_{link_x:>02}_{link_y:>02}.zip").content)) as zip_obj:
+                            # Loop through the files in the zip
+                            for filename in zip_obj.namelist():
+                                # Don't extract the readme.txt
+                                if filename != 'readme.txt':
+                                    data = zip_obj.read(filename)
+                                    # Write byte contents to file
+                                    with open(path.join(TILES_DIR, filename), 'wb') as f:
+                                        f.write(data)        
+                        log.debug("Downloaded file {} to {}".format(link.text, TILES_DIR))
+                    else:
+                        log.debug("File {} already exists in {}".format(link.text, TILES_DIR))
+                except:
+                    continue
+
+
             
 
 def raster2pgsql():
