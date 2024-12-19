@@ -4,7 +4,7 @@ services:
     #network_mode: "host"
     build: .
     volumes:
-      - /mnt/data/tiles/:/deploy/app/tiles
+      - ./tiles/:/deploy/app/tiles
     ports:
       - "5020:5000"
     mem_limit: 6g
@@ -17,16 +17,15 @@ services:
       - elevation-service-network
 
   elevation-postgis:
-    image: kartoza/postgis:13-3.1
-    container_name: elevation-postgis-1
+    image: postgis/postgis:17-3.5
+    container_name: elevation-postgis
     volumes:
-      - /mnt/data/postgresql/:/var/lib/postgresql
+      - ./postgresql/:/var/lib/postgresql/data
+      - ./postgis/20_create_extension_postgis_raster.sql:/docker-entrypoint-initdb.d/20_create_extension_postgis_raster.sql
     environment:
       - POSTGRES_DB=gis
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=gZwe5Nj
-      - POSTGRES_MULTIPLE_EXTENSIONS=postgis,hstore,postgis_topology,postgis_raster
-      - PASSWORD_AUTHENTICATION=md5
     ports:
       - 5432:5432
     restart: on-failure
