@@ -1,7 +1,7 @@
-FROM ubuntu:18.04 AS builder
+FROM ubuntu:24.04 AS builder
 
 RUN apt-get update
-RUN apt-get -y install build-essential python3-dev python3-venv
+RUN apt-get -y install build-essential python3-dev python3-venv libpq-dev
 
 RUN mkdir -p /deploy/app
 
@@ -16,13 +16,13 @@ RUN /bin/bash -c "source /oes_venv/bin/activate"
 RUN /oes_venv/bin/pip3 install wheel
 RUN /oes_venv/bin/pip3 install -r /deploy/app/requirements.txt
 
-FROM ubuntu:18.04
+FROM ubuntu:24.04
 
 COPY --from=builder /deploy /deploy
 COPY --from=builder /oes_venv /oes_venv
 
 RUN apt-get update \
-    && /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install locales postgis postgresql-client python3-venv tzdata" \
+    && /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install locales postgis postgresql-common postgresql-client python3-venv tzdata" \
     && ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime \
     && dpkg-reconfigure --frontend noninteractive tzdata \
     && locale-gen en_US.UTF-8 \
